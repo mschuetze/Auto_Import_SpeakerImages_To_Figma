@@ -1,10 +1,9 @@
-// v0.2.4
+// v0.3.1 – Positionierung am unteren rechten Rand des obersten Frames
 
-// 🔁 Konfiguration
 const baseURL = "http://localhost:8888/bilder/";
-const imageSize = 200;
+const imageSize = 400;
+const padding = 24;
 
-// 🧰 Umlaute ersetzen
 function replaceUmlauts(str) {
   return str
     .replace(/ä/g, "ae")
@@ -16,9 +15,9 @@ function replaceUmlauts(str) {
     .replace(/ß/g, "ss");
 }
 
-// 🚀 Hauptfunktion
 async function runPlugin() {
   console.log("▶️ Plugin gestartet");
+
   const textNodes = figma.currentPage.findAll(node =>
     node.type === "TEXT" && node.name === "Speaker_Firma"
   );
@@ -27,8 +26,8 @@ async function runPlugin() {
     const rawText = textNode.characters.trim();
     const speakerName = rawText.split("(")[0].trim();
     const cleaned = replaceUmlauts(speakerName);
-
     const parts = cleaned.split(/\s+/);
+
     if (parts.length < 2) {
       console.log(`❗ Unvollständiger Name bei: "${rawText}"`);
       continue;
@@ -59,6 +58,24 @@ async function runPlugin() {
       const arrayBuffer = await response.arrayBuffer();
       const image = figma.createImage(new Uint8Array(arrayBuffer));
 
+      // 🔍 Obersten Frame finden
+      let parent = textNode.parent;
+      let topFrame = null;
+      while (parent) {
+        if (parent.type === "FRAME" && !parent.parent) {
+          topFrame = parent;
+          break;
+        }
+        if (parent.type === "FRAME") topFrame = parent;
+        parent = parent.parent;
+      }
+
+      if (!topFrame) {
+        console.warn(`⚠️ Kein übergeordneter Frame gefunden für: ${rawText}`);
+        continue;
+      }
+
+      // 🎯 Bild erstellen
       const rect = figma.createRectangle();
       rect.resize(imageSize, imageSize);
       rect.fills = [{
@@ -67,17 +84,19 @@ async function runPlugin() {
         imageHash: image.hash
       }];
 
-      rect.x = textNode.absoluteTransform[0][2] + 250;
-      rect.y = textNode.absoluteTransform[1][2];
+      // 📐 Position: rechts unten relativ zum Frame
+      rect.x = topFrame.x + topFrame.width - imageSize - padding;
+      rect.y = topFrame.y + topFrame.height - imageSize;
 
-      textNode.parent.appendChild(rect);
+      // ➕ Direkt in den obersten Frame einfügen
+      figma.currentPage.appendChild(rect);
+
     } catch (err) {
       console.error(`❌ Fehler beim Laden von ${imageURL}:`, err);
     }
   }
 
-  figma.closePlugin("✅ Bilder wurden geladen.");
+  figma.closePlugin("✅ Bilder wurden geladen und korrekt positioniert.");
 }
 
-// 📩 Listener starten, wenn das Plugin aus UI aufgerufen wird
 runPlugin();
