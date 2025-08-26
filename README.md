@@ -24,6 +24,7 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 - Datei **httpd.conf** ersetzen
   - via App **Finder** hier hin navigieren: */Programme/MAMP/conf/*
   - dortige Datei mit der Datei aus dem Github-Download (MAMP-Ordner) ersetzen
+  - unsichtbare/versteckte Dateien wieder unsichtbar machen mittels Tastenkombination Befehl (⌘) + Umschalttaste (⇧) + Punkt (.) 
 
 ## Plugin installieren
 - Figma Desktop-App öffnen
