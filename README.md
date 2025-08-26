@@ -1,6 +1,12 @@
 # Auto_Import_SpeakerImages_To_Figma
 Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenführung automatisiert Speakerbilder hinzuzufügen. 
 
+## Was es tut
+- durchsucht die aktuelle Figma-Seite nach Textfeldern mit dem Namen **Speaker_Firma**
+- extrahiert daraus den Vor- und Nachnamen
+- erstellt daraus dynamisch einen Bildpfad
+- lädt das entsprechende Sprecherbild und platziert es automatisch neben dem Textfeld
+
 ## Voraussetzungen
 ### 1. Figma Desktop-App
 - herunterladen + installieren: https://www.figma.com/de-de/downloads/
@@ -10,6 +16,7 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 ### 3. aktive Server-Verbindung
 - Verbindung zum GRAFIK-Server muss zwingend bestehen. Wahlweise direkt (im Büro) oder via VPN
 ### 4. MAMP-Webserver
+Figma-Plugins dürfen aus Sicherheitsgründen keine lokalen Daten laden. Daher müssen wir so tun, als lägen unsere Speakerbilder auf einem Webserver. Dies tun wir mittels der App MAMP.
 - herunterladen + installieren: https://www.mamp.info/de/mac/
 - Verknüpfung zu Ordner **Speaker- und Autorenbilder** erstellen:
   - App **Terminal** öffnen
