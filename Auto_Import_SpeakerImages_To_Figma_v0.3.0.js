@@ -1,9 +1,11 @@
-// v0.3.1 – Positionierung am unteren rechten Rand des obersten Frames
+// v0.3.0
 
+// 🔁 Konfiguration
 const baseURL = "http://localhost:8888/bilder/";
 const imageSize = 400;
-const padding = 24;
+const padding = 24; // Abstand vom Rand
 
+// 🧰 Umlaute ersetzen
 function replaceUmlauts(str) {
   return str
     .replace(/ä/g, "ae")
@@ -15,6 +17,7 @@ function replaceUmlauts(str) {
     .replace(/ß/g, "ss");
 }
 
+// 🚀 Hauptfunktion
 async function runPlugin() {
   console.log("▶️ Plugin gestartet");
 
@@ -58,24 +61,17 @@ async function runPlugin() {
       const arrayBuffer = await response.arrayBuffer();
       const image = figma.createImage(new Uint8Array(arrayBuffer));
 
-      // 🔍 Obersten Frame finden
+      // 📦 Obersten übergeordneten FRAME finden
       let parent = textNode.parent;
-      let topFrame = null;
-      while (parent) {
-        if (parent.type === "FRAME" && !parent.parent) {
-          topFrame = parent;
-          break;
-        }
-        if (parent.type === "FRAME") topFrame = parent;
+      while (parent && parent.type !== "FRAME") {
         parent = parent.parent;
       }
 
-      if (!topFrame) {
-        console.warn(`⚠️ Kein übergeordneter Frame gefunden für: ${rawText}`);
+      if (!parent || parent.type !== "FRAME") {
+        console.warn(`⚠️ Kein übergeordneter FRAME für: ${rawText}`);
         continue;
       }
 
-      // 🎯 Bild erstellen
       const rect = figma.createRectangle();
       rect.resize(imageSize, imageSize);
       rect.fills = [{
@@ -84,19 +80,18 @@ async function runPlugin() {
         imageHash: image.hash
       }];
 
-      // 📐 Position: rechts unten relativ zum Frame
-      rect.x = topFrame.x + topFrame.width - imageSize - padding;
-      rect.y = topFrame.y + topFrame.height - imageSize;
+      // 📍 Bild am rechten unteren Rand positionieren
+      rect.x = parent.width - imageSize - padding;
+      rect.y = parent.height - imageSize - padding;
 
-      // ➕ Direkt in den obersten Frame einfügen
-      figma.currentPage.appendChild(rect);
-
+      parent.appendChild(rect);
     } catch (err) {
       console.error(`❌ Fehler beim Laden von ${imageURL}:`, err);
     }
   }
 
-  figma.closePlugin("✅ Bilder wurden geladen und korrekt positioniert.");
+  figma.closePlugin("✅ Bilder wurden geladen und positioniert.");
 }
 
+// 📩 Listener starten
 runPlugin();
