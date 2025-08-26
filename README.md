@@ -2,12 +2,12 @@
 Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenführung automatisiert Speakerbilder hinzuzufügen. 
 
 ## Voraussetzungen
-### Figma Desktop-App
+### 1. Figma Desktop-App
 - herunterladen + installieren: https://www.figma.com/de-de/downloads/
-### Github-Projekt
+### 2. Github-Projekt
 - neuesten Release herunterladen: https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/releases
 - entzippten Ordner unter folgendem Pfad ablegen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/*
-### MAMP-Webserver
+### 3. MAMP-Webserver
 - herunterladen + installieren: https://www.mamp.info/de/mac/
 - Verknüpfung zu Ordner **Speaker- und Autorenbilder** erstellen:
   - App **Terminal** öffnen
@@ -26,5 +26,6 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 ## Plugin installieren
 - Figma Desktop-App öffnen
 - Datei mit den Programmgrafiken öffnen
-- via Menüleiste am oberen Rand: Plugins > Development > Import plugin from manifest…
+- via Menüleiste am oberen Rand: `Plugins > Development > Import plugin from manifest…`
   - Datei **manifest.json** im abgelegten Github-Ordner auswählen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/Auto_Import_SpeakerImages_To_Figma/manifest.json*
+- das Plugin ist nun installiert
