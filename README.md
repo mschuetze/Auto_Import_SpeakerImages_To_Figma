@@ -31,13 +31,7 @@ Figma-Plugins dürfen aus Sicherheitsgründen keine lokalen Daten laden. Daher m
 - Datei **httpd.conf** ersetzen
   - via App **Finder** hier hin navigieren: */Programme/MAMP/conf/*
   - dortige Datei mit der Datei aus dem Github-Download (MAMP-Ordner) ersetzen
-<<<<<<< HEAD
-<<<<<<< HEAD
   - unsichtbare/versteckte Dateien wieder unsichtbar machen mittels Tastenkombination `Befehl (⌘) + Umschalttaste (⇧) + Punkt (.)`
-=======
->>>>>>> parent of 2baf614 (v0.2.4)
-=======
->>>>>>> parent of 2baf614 (v0.2.4)
 
 ## Plugin installieren
 - Figma Desktop-App öffnen
