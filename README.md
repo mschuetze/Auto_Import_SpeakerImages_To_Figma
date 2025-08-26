@@ -12,9 +12,9 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
   - überprüfen, ob Verknüpfung korrekt erstellt wurde:
     - via App **Finder** hier hin navigieren: *Programme/MAMP/htdocs/*
     - existiert dort ein Ordner "bilder", dann hat es geklappt
-  - Datei **.htaccess** einfügen:
-    - via App **Finder** hier hin navigieren: *Programme/MAMP/htdocs/*
-    - Datei aus dem Github-Download (MAMP-Ordner) einfügen 
-  - Datei **httpd.conf** ersetzen
-    - via App **Finder** hier hin navigieren: */Programme/MAMP/conf/*
-    - dortige Datei mit der Datei aus dem Github-Download (MAMP-Ordner) ersetzen
+- Datei **.htaccess** einfügen:
+  - via App **Finder** hier hin navigieren: *Programme/MAMP/htdocs/*
+  - Datei aus dem Github-Download (MAMP-Ordner) einfügen 
+- Datei **httpd.conf** ersetzen
+  - via App **Finder** hier hin navigieren: */Programme/MAMP/conf/*
+  - dortige Datei mit der Datei aus dem Github-Download (MAMP-Ordner) ersetzen
