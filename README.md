@@ -7,7 +7,9 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 ### 2. Github-Projekt
 - neuesten Release herunterladen: https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/releases
 - entzippten Ordner unter folgendem Pfad ablegen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/*
-### 3. MAMP-Webserver
+### 3. aktive Server-Verbindung
+- Verbindung zum GRAFIK-Server muss zwingend bestehen. Wahlweise direkt (im Büro) oder via VPN
+### 4. MAMP-Webserver
 - herunterladen + installieren: https://www.mamp.info/de/mac/
 - Verknüpfung zu Ordner **Speaker- und Autorenbilder** erstellen:
   - App **Terminal** öffnen
