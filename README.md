@@ -19,12 +19,12 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
     - existiert dort ein Ordner "bilder", dann hat es geklappt
 - Datei **.htaccess** einfügen:
   - via App **Finder** hier hin navigieren: *Programme/MAMP/htdocs/*
-  - unsichtbare/versteckte Dateien sichtbar machen mittels Tastenkombination Befehl (⌘) + Umschalttaste (⇧) + Punkt (.) 
+  - unsichtbare/versteckte Dateien sichtbar machen mittels Tastenkombination `Befehl (⌘) + Umschalttaste (⇧) + Punkt (.)`
   - Datei aus dem Github-Download (MAMP-Ordner) einfügen 
 - Datei **httpd.conf** ersetzen
   - via App **Finder** hier hin navigieren: */Programme/MAMP/conf/*
   - dortige Datei mit der Datei aus dem Github-Download (MAMP-Ordner) ersetzen
-  - unsichtbare/versteckte Dateien wieder unsichtbar machen mittels Tastenkombination Befehl (⌘) + Umschalttaste (⇧) + Punkt (.) 
+  - unsichtbare/versteckte Dateien wieder unsichtbar machen mittels Tastenkombination `Befehl (⌘) + Umschalttaste (⇧) + Punkt (.)`
 
 ## Plugin installieren
 - Figma Desktop-App öffnen
