@@ -32,3 +32,9 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 - via Menüleiste am oberen Rand: `Plugins > Development > Import plugin from manifest…`
   - Datei **manifest.json** im abgelegten Github-Ordner auswählen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/Auto_Import_SpeakerImages_To_Figma/manifest.json*
 - das Plugin ist nun installiert
+
+## Plugin verwenden
+- Figma Desktop-App öffnen
+- Datei mit den Programmgrafiken öffnen
+- Plugin-Übersicht aufrufen via Menüleiste am oberen Rand: `Plugins > Manage plugins…`
+- Plugin **Auto_Import_SpeakerImages_To_Figma** anklicken
