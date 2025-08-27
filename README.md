@@ -53,7 +53,7 @@ Figma-Plugins dürfen aus Sicherheitsgründen keine lokalen Daten laden. Daher m
 - das Plugin ist nun installiert
 
 ## Plugin verwenden
-- Serververbindung herstellen
+- Verbindung zu GRAFIK-Server herstellen
 - App **MAMP** starten
   - Webserver per START-Icon starten
 - Figma Desktop-App öffnen
