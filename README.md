@@ -77,10 +77,14 @@ Zunächst müssen alle [Voraussetzungen](#voraussetzungen) erfüllt sein.
 
 ## Plugin aktualisieren
 Wenn eine neuere Version des Plugins verfügbar ist, müssen folgende Schritte erledigt werden, um es korrekt einzubinden:
-- Figma Desktop-App öffnen
-- Plugin-Übersicht aufrufen via Menüleiste am oberen Rand: `Plugins > Manage plugins…`
-- Plugin deinstallieren via: `Hamburger-Menü (3 Punkte) > Remove`
-- MAMP-Webserver (nicht die App) beenden via BEENDEN-Button (oben rechts)
-- neuesten Release herunterladen: https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/releases
-- entzippten Ordner unter folgendem Pfad ablegen/ersetzen/ggf. alten löschen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/*
-- weiter mit [Plugin installieren](#plugin-installieren)
+1. **altes Plugin deinstallieren**
+  - Figma Desktop-App öffnen
+  - Plugin-Übersicht aufrufen via Menüleiste am oberen Rand: `Plugins > Manage plugins…`
+  - Plugin deinstallieren via: `Hamburger-Menü (3 Punkte) > Remove`
+2. **MAMP-Server beenden**
+  - MAMP-Webserver (nicht die App) beenden via BEENDEN-Button (oben rechts)
+3. **neuestes Plugin herunterladen**
+  - neuesten Release herunterladen: https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/releases
+  - entzippten Ordner unter folgendem Pfad ablegen/ersetzen/ggf. alten löschen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/*
+4. **neues Plugin installieren**
+  - weiter mit [Plugin installieren](#plugin-installieren)
