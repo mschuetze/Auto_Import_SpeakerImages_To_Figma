@@ -32,7 +32,7 @@ Figma-Plugins dürfen aus Sicherheitsgründen keine lokalen Daten laden. Daher m
   - via App **Finder** hier hin navigieren: */Programme/MAMP/conf/apache/*
   - dortige Datei mit der Datei aus dem Github-Download (MAMP-Ordner) ersetzen
   - unsichtbare/versteckte Dateien wieder unsichtbar machen mittels Tastenkombination `Befehl (⌘) + Umschalttaste (⇧) + Punkt (.)`
-- MAMP starten: */Programme/MAMP/MAMP*
+- App **MAMP** starten: */Programme/MAMP/MAMP*
   - nach Start Rechtsklick auf Icon im Dock: `Optionen > Im Dock behalten`
 - Webserver in MAMP per START-Icon (oben rechts) starten
 
@@ -44,7 +44,7 @@ Figma-Plugins dürfen aus Sicherheitsgründen keine lokalen Daten laden. Daher m
 - das Plugin ist nun installiert
 
 ## Plugin verwenden
-- App MAMP starten
+- App **MAMP** starten
   - Webserver per START-Icon starten
 - Figma Desktop-App öffnen
 - Datei mit den Programmgrafiken öffnen
