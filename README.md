@@ -10,9 +10,12 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 
 ## Was es tut
 - durchsucht die aktuelle Figma-Seite nach Textfeldern mit dem Namen **Speaker_Firma**
-- extrahiert daraus den Vor- und Nachnamen
-- erstellt daraus dynamisch einen Bildpfad
-- lädt das entsprechende Sprecherbild und platziert es automatisch neben dem Textfeld
+- falls gefunden:
+  - extrahiert daraus den Vor- und Nachnamen
+  - erstellt daraus dynamisch einen Bildpfad
+  - durchsucht die aktuelle Grafik nach einem Bildrahmen mit dem Namen **Speakerbild**
+  - falls gefunden:
+    - lädt das entsprechende Speakerbild und platziert es automatisch in dem Bildrahmen
 
 ## Voraussetzungen
 ### 1. Figma Desktop-App
