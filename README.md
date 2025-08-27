@@ -20,6 +20,7 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 ### 2. Github-Projekt
 - neuesten Release herunterladen: https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/releases
 - entzippten Ordner unter folgendem Pfad ablegen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/*
+- ggf. alten Plugin-Ordner löschen
 ### 3. aktive Server-Verbindung
 - Verbindung zum GRAFIK-Server muss zwingend bestehen. Wahlweise direkt (im Büro) oder via VPN
 ### 4. MAMP-Webserver
@@ -70,5 +71,5 @@ Wenn eine neuere Version des Plugins verfügbar ist, müssen folgende Schritte e
 - Plugin deinstallieren via: `Hamburger-Menü (3 Punkte) > Remove`
 - MAMP-Webserver (nicht die App) beenden via BEENDEN-Button (oben rechts)
 - neuesten Release herunterladen: https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/releases
-- entzippten Ordner unter folgendem Pfad ablegen/ersetzen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/*
+- entzippten Ordner unter folgendem Pfad ablegen/ersetzen/ggf. alten löschen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/*
 - weiter mit [Plugin installieren](#plugin-installieren)
