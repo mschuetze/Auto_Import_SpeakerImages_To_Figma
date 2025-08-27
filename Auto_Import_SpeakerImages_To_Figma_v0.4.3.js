@@ -1,10 +1,8 @@
-// v0.4.0
+// v0.4.3
 
-// 🔁 Konfiguration
 const baseURL = "http://localhost:8888/bilder/";
-const imageSize = 400;
 
-// 🧰 Umlaute ersetzen
+// Umlautersetzung
 function replaceUmlauts(str) {
   return str
     .replace(/ä/g, "ae")
@@ -16,26 +14,37 @@ function replaceUmlauts(str) {
     .replace(/ß/g, "ss");
 }
 
-// 🔝 Hilfsfunktion: Obersten übergeordneten Frame finden
-function getTopFrame(node) {
-  let current = node.parent;
-  while (current && current.type !== "PAGE") {
-    if (current.type === "FRAME") return current;
-    current = current.parent;
-  }
-  return null;
+// Hilfsfunktion: Findet rekursiv den Text-Knoten "Speaker_Firma" in einem Frame
+function findSpeakerFirmaNode(frame) {
+  return frame.findOne(node => node.name === "Speaker_Firma" && node.type === "TEXT");
 }
 
-// 🚀 Hauptfunktion
+// Hauptfunktion
 async function runPlugin() {
   console.log("▶️ Plugin gestartet");
 
-  const textNodes = figma.currentPage.findAll(node =>
-    node.type === "TEXT" && node.name === "Speaker_Firma"
+  // Alle Frames finden, die ein Kind "Speakerbild" haben
+  const graphicFrames = figma.currentPage.findAll(node =>
+    node.type === "FRAME" &&
+    node.children.some(child => child.name === "Speakerbild")
   );
 
-  for (const textNode of textNodes) {
-    const rawText = textNode.characters.trim();
+  for (const frame of graphicFrames) {
+    // Direktes Kind "Speakerbild"
+    const speakerbildNode = frame.children.find(child => child.name === "Speakerbild");
+    if (!speakerbildNode) {
+      console.warn(`⚠️ Kein Speakerbild-Knoten gefunden im Frame: ${frame.name}`);
+      continue;
+    }
+
+    // Speaker_Firma (irgendwo rekursiv unterhalb von frame)
+    const speakerFirmaNode = findSpeakerFirmaNode(frame);
+    if (!speakerFirmaNode) {
+      console.warn(`⚠️ Kein Speaker_Firma-Knoten gefunden im Frame: ${frame.name}`);
+      continue;
+    }
+
+    const rawText = speakerFirmaNode.characters.trim();
     const speakerName = rawText.split("(")[0].trim();
     const cleaned = replaceUmlauts(speakerName);
     const parts = cleaned.split(/\s+/);
@@ -48,6 +57,7 @@ async function runPlugin() {
     const [firstName, lastName] = parts;
     const fileName = `${lastName}_${firstName}_frei.png`;
 
+    // Ordner-Logik
     const firstLetter = lastName[0].toLowerCase();
     let folder = "";
     if ("abc".includes(firstLetter)) folder = "abc/";
@@ -59,6 +69,10 @@ async function runPlugin() {
     else if ("st".includes(firstLetter)) folder = "st/";
     else if ("uvw".includes(firstLetter)) folder = "uvw/";
     else if ("xyz".includes(firstLetter)) folder = "xyz/";
+    else {
+      console.warn(`⚠️ Unbekannter Anfangsbuchstabe: "${firstLetter}" bei "${rawText}"`);
+      continue;
+    }
 
     const imageURL = `${baseURL}${folder}${fileName}`;
     console.log(`⬇️ Lade Bild: ${imageURL}`);
@@ -70,29 +84,22 @@ async function runPlugin() {
       const arrayBuffer = await response.arrayBuffer();
       const image = figma.createImage(new Uint8Array(arrayBuffer));
 
-      // 🔍 Obersten Grafik-Frame finden
-      const topFrame = getTopFrame(textNode);
-      if (!topFrame) {
-        console.warn(`⚠️ Kein übergeordneter Grafik-Frame gefunden für: ${rawText}`);
+      // Prüfen ob Speakerbild Node Bildfüllung unterstützt
+      const validTypes = ["RECTANGLE", "ELLIPSE", "FRAME", "POLYGON", "STAR"];
+      if (!validTypes.includes(speakerbildNode.type)) {
+        console.warn(`⚠️ "Speakerbild" ist vom Typ "${speakerbildNode.type}" und unterstützt keine Bildfüllung.`);
         continue;
       }
 
-      // 🔍 "Speakerbild" im Grafik-Frame suchen
-      const targetNode = topFrame.findOne(node => node.name === "Speakerbild");
-
-      if (!targetNode || !"fills" in targetNode) {
-        console.warn(`⚠️ Kein gültiger "Speakerbild"-Knoten gefunden für: ${rawText}`);
-        continue;
-      }
-
-      // 🖼️ Bild als Füllung setzen
-      targetNode.fills = [{
-        type: 'IMAGE',
-        scaleMode: 'FILL',
-        imageHash: image.hash
+      // Bild als Fill setzen
+      speakerbildNode.fills = [{
+        type: "IMAGE",
+        scaleMode: "FILL",
+        imageHash: image.hash,
       }];
 
       console.log(`✅ Bild in "Speakerbild" gesetzt für: ${rawText}`);
+
     } catch (err) {
       console.error(`❌ Fehler beim Laden von ${imageURL}:`, err);
     }
@@ -101,5 +108,5 @@ async function runPlugin() {
   figma.closePlugin("✅ Bilder wurden eingesetzt.");
 }
 
-// 📩 Plugin starten
+// Plugin starten
 runPlugin();
