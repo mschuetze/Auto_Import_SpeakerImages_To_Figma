@@ -63,7 +63,7 @@ Zunächst müssen alle [Voraussetzungen](#voraussetzungen) erfüllt sein.
 - Figma Desktop-App öffnen
 - Datei mit den Programmgrafiken öffnen
 - via Menüleiste am oberen Rand: `Plugins > Development > Import plugin from manifest…`
-  - Datei **manifest.json** im abgelegten Github-Ordner auswählen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/Auto_Import_SpeakerImages_To_Figma/manifest.json*
+  - Datei **manifest.json** im abgelegten Github-Ordner auswählen: `/Benutzer/[EuerBenutzer]/Dokumente/Skripte/Auto_Import_SpeakerImages_To_Figma/manifest.json`
 - das Plugin ist nun installiert
 
 ## Plugin verwenden
@@ -85,6 +85,6 @@ Wenn eine neuere Version des Plugins verfügbar ist, müssen folgende Schritte e
   - MAMP-Webserver (nicht die App) beenden via BEENDEN-Button (oben rechts)
 3. **neuestes Plugin herunterladen**
   - neuesten Release herunterladen: https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/releases
-  - entzippten Ordner unter folgendem Pfad ablegen/ersetzen/ggf. alten löschen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/*
+  - entzippten Ordner unter folgendem Pfad ablegen/ersetzen/ggf. alten löschen: `/Benutzer/[EuerBenutzer]/Dokumente/Skripte/`
 4. **neues Plugin installieren**
   - weiter mit [Plugin installieren](#plugin-installieren)
