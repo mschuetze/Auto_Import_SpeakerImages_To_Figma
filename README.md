@@ -1,6 +1,13 @@
 # Auto_Import_SpeakerImages_To_Figma
 Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenführung automatisiert Speakerbilder hinzuzufügen. 
 
+## Inhaltsverzeichnis
+- [Was es tut](#was-es-tut)
+- [Voraussetzungen](#voraussetzungen)
+- [Plugin installieren](#plugin-installieren)
+- [Plugin verwenden](#plugin-verwenden)
+- [Plugin aktualisieren](#plugin-aktualisieren)
+
 ## Was es tut
 - durchsucht die aktuelle Figma-Seite nach Textfeldern mit dem Namen **Speaker_Firma**
 - extrahiert daraus den Vor- und Nachnamen
