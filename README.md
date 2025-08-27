@@ -59,3 +59,4 @@ Wenn eine neuere Version des Plugins verfügbar ist, müssen folgende Schritte e
 - MAMP-Webserver (nicht die App) beenden via BEENDEN-Button (oben rechts)
 - neuesten Release herunterladen: https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/releases
 - entzippten Ordner unter folgendem Pfad ablegen/ersetzen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/*
+- weiter mit [Plugin installieren](#plugin-installieren)
