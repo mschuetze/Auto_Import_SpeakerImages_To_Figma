@@ -46,6 +46,8 @@ Figma-Plugins dürfen aus Sicherheitsgründen keine lokalen Daten laden. Daher m
 - Webserver in MAMP per START-Icon (oben rechts) starten
 
 ## Plugin installieren
+Zunächst müssen alle [Voraussetzungen](#voraussetzungen) erfüllt sein.
+
 - Figma Desktop-App öffnen
 - Datei mit den Programmgrafiken öffnen
 - via Menüleiste am oberen Rand: `Plugins > Development > Import plugin from manifest…`
