@@ -24,7 +24,6 @@ Figma-Plugins dürfen aus Sicherheitsgründen keine lokalen Daten laden. Daher m
   - überprüfen, ob Verknüpfung korrekt erstellt wurde:
     - via App **Finder** hier hin navigieren: *Programme/MAMP/htdocs/*
     - existiert dort ein Ordner "bilder", dann hat es geklappt
-<!-- diesen Teil unten bei Punkt "Plugin aktualisieren" recyceln -->
 - Datei **.htaccess** einfügen:
   - via App **Finder** hier hin navigieren: *Programme/MAMP/htdocs/*
   - unsichtbare/versteckte Dateien sichtbar machen mittels Tastenkombination `Befehl (⌘) + Umschalttaste (⇧) + Punkt (.)`
@@ -58,16 +57,5 @@ Wenn eine neuere Version des Plugins verfügbar ist, müssen folgende Schritte e
 - Plugin-Übersicht aufrufen via Menüleiste am oberen Rand: `Plugins > Manage plugins…`
 - Plugin deinstallieren via: `Hamburger-Menü (3 Punkte) > Remove`
 - MAMP-Webserver (nicht die App) beenden via BEENDEN-Button (oben rechts)
-- neueste Plugin-Version von Github herunterladen: https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/releases
-<!-- Teil von oben hier einfügen -->
-- Datei **.htaccess** einfügen:
-  - via App **Finder** hier hin navigieren: *Programme/MAMP/htdocs/*
-  - unsichtbare/versteckte Dateien sichtbar machen mittels Tastenkombination `Befehl (⌘) + Umschalttaste (⇧) + Punkt (.)`
-  - Datei aus dem Github-Download (MAMP-Ordner) einfügen 
-- Datei **httpd.conf** ersetzen
-  - via App **Finder** hier hin navigieren: */Programme/MAMP/conf/apache/*
-  - dortige Datei mit der Datei aus dem Github-Download (MAMP-Ordner) ersetzen
-  - unsichtbare/versteckte Dateien wieder unsichtbar machen mittels Tastenkombination `Befehl (⌘) + Umschalttaste (⇧) + Punkt (.)`
-- App **MAMP** starten: */Programme/MAMP/MAMP*
-  - nach Start Rechtsklick auf Icon im Dock: `Optionen > Im Dock behalten`
-- Webserver in MAMP per START-Icon (oben rechts) starten
+- neuesten Release herunterladen: https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/releases
+- entzippten Ordner unter folgendem Pfad ablegen/ersetzen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/*
