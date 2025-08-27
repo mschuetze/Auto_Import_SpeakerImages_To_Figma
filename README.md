@@ -29,7 +29,7 @@ Figma-Plugins dürfen aus Sicherheitsgründen keine lokalen Daten laden. Daher m
   - unsichtbare/versteckte Dateien sichtbar machen mittels Tastenkombination `Befehl (⌘) + Umschalttaste (⇧) + Punkt (.)`
   - Datei aus dem Github-Download (MAMP-Ordner) einfügen 
 - Datei **httpd.conf** ersetzen
-  - via App **Finder** hier hin navigieren: */Programme/MAMP/conf/*
+  - via App **Finder** hier hin navigieren: */Programme/MAMP/conf/apache/*
   - dortige Datei mit der Datei aus dem Github-Download (MAMP-Ordner) ersetzen
   - unsichtbare/versteckte Dateien wieder unsichtbar machen mittels Tastenkombination `Befehl (⌘) + Umschalttaste (⇧) + Punkt (.)`
 
