@@ -22,32 +22,40 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 - herunterladen + installieren: https://www.figma.com/de-de/downloads/
 ### 2. Github-Projekt
 - neuesten Release herunterladen: https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/releases
-- entzippten Ordner unter folgendem Pfad ablegen: */Benutzer/[EuerBenutzer]/Dokumente/Skripte/*
+- entzippten Ordner unter folgendem Pfad ablegen: `/Benutzer/[EuerBenutzer]/Dokumente/Skripte/`
 - ggf. alten Plugin-Ordner löschen
 ### 3. aktive Server-Verbindung
 - Verbindung zum GRAFIK-Server muss zwingend bestehen. Wahlweise direkt (im Büro) oder via VPN
 ### 4. MAMP-Webserver
 > Dies ist ein einmaliger Prozess.
 
-Figma-Plugins dürfen aus Sicherheitsgründen keine lokalen Daten laden. Daher müssen wir so tun, als lägen unsere Speakerbilder auf einem Webserver. Dies tun wir mittels der App MAMP.
-- herunterladen + installieren: https://www.mamp.info/de/mac/
-- Verknüpfung zu Ordner **Speaker- und Autorenbilder** erstellen:
+Figma-Plugins dürfen aus Sicherheitsgründen keine lokalen Dateien laden. Wir umgehen das, indem wir MAMP als lokalen Webserver nutzen.
+
+#### Schritte:
+1. **MAMP herunterladen und installieren** 
+  - Link: https://www.mamp.info/de/mac/
+
+2. **Ordner-Verknüpfung erstellen**
   - App **Terminal** öffnen
   - folgenden Code einfügen und mit ENTER bestätigen: `ln -s "/Volumes/GRAFIK/Grafik1/Speaker- und Autorenbilder" "/Applications/MAMP/htdocs/bilder"`
   - überprüfen, ob Verknüpfung korrekt erstellt wurde:
-    - via App **Finder** hier hin navigieren: *Programme/MAMP/htdocs/*
+    - via App **Finder** hier hin navigieren: `Programme/MAMP/htdocs/`
     - existiert dort ein Ordner "bilder", dann hat es geklappt
-- Datei **.htaccess** einfügen:
-  - via App **Finder** hier hin navigieren: *Programme/MAMP/htdocs/*
+
+3. **.htaccess einfügen**
+  - via App **Finder** hier hin navigieren: `Programme/MAMP/htdocs/`
   - unsichtbare/versteckte Dateien sichtbar machen mittels Tastenkombination `Befehl (⌘) + Umschalttaste (⇧) + Punkt (.)`
-  - Datei aus dem Github-Download (MAMP-Ordner) einfügen 
-- Datei **httpd.conf** ersetzen
-  - via App **Finder** hier hin navigieren: */Programme/MAMP/conf/apache/*
+  - Füge Datei **.htaccess** aus dem GitHub-Download ein
+
+4. **httpd.conf ersetzen**
+  - via App **Finder** hier hin navigieren: `/Programme/MAMP/conf/apache/`
   - dortige Datei mit der Datei aus dem Github-Download (MAMP-Ordner) ersetzen
   - unsichtbare/versteckte Dateien wieder unsichtbar machen mittels Tastenkombination `Befehl (⌘) + Umschalttaste (⇧) + Punkt (.)`
-- App **MAMP** starten: */Programme/MAMP/MAMP*
-  - nach Start Rechtsklick auf Icon im Dock: `Optionen > Im Dock behalten`
-- Webserver in MAMP per START-Icon (oben rechts) starten
+
+5. **MAMP starten**
+  - App **MAMP** starten: */Programme/MAMP/MAMP*
+    - nach Start Rechtsklick auf Icon im Dock: `Optionen > Im Dock behalten`
+  - Webserver in MAMP per START-Icon (oben rechts) starten
 
 ## Plugin installieren
 Zunächst müssen alle [Voraussetzungen](#voraussetzungen) erfüllt sein.
