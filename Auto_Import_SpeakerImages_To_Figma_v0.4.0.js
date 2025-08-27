@@ -1,9 +1,8 @@
-// v0.3.0
+// v0.4.0
 
 // 🔁 Konfiguration
 const baseURL = "http://localhost:8888/bilder/";
 const imageSize = 400;
-const padding = 24; // Abstand vom Rand
 
 // 🧰 Umlaute ersetzen
 function replaceUmlauts(str) {
@@ -15,6 +14,16 @@ function replaceUmlauts(str) {
     .replace(/Ö/g, "Oe")
     .replace(/Ü/g, "Ue")
     .replace(/ß/g, "ss");
+}
+
+// 🔝 Hilfsfunktion: Obersten übergeordneten Frame finden
+function getTopFrame(node) {
+  let current = node.parent;
+  while (current && current.type !== "PAGE") {
+    if (current.type === "FRAME") return current;
+    current = current.parent;
+  }
+  return null;
 }
 
 // 🚀 Hauptfunktion
@@ -61,37 +70,36 @@ async function runPlugin() {
       const arrayBuffer = await response.arrayBuffer();
       const image = figma.createImage(new Uint8Array(arrayBuffer));
 
-      // 📦 Obersten übergeordneten FRAME finden
-      let parent = textNode.parent;
-      while (parent && parent.type !== "FRAME") {
-        parent = parent.parent;
-      }
-
-      if (!parent || parent.type !== "FRAME") {
-        console.warn(`⚠️ Kein übergeordneter FRAME für: ${rawText}`);
+      // 🔍 Obersten Grafik-Frame finden
+      const topFrame = getTopFrame(textNode);
+      if (!topFrame) {
+        console.warn(`⚠️ Kein übergeordneter Grafik-Frame gefunden für: ${rawText}`);
         continue;
       }
 
-      const rect = figma.createRectangle();
-      rect.resize(imageSize, imageSize);
-      rect.fills = [{
+      // 🔍 "Speakerbild" im Grafik-Frame suchen
+      const targetNode = topFrame.findOne(node => node.name === "Speakerbild");
+
+      if (!targetNode || !"fills" in targetNode) {
+        console.warn(`⚠️ Kein gültiger "Speakerbild"-Knoten gefunden für: ${rawText}`);
+        continue;
+      }
+
+      // 🖼️ Bild als Füllung setzen
+      targetNode.fills = [{
         type: 'IMAGE',
         scaleMode: 'FILL',
         imageHash: image.hash
       }];
 
-      // 📍 Bild am rechten unteren Rand positionieren
-      rect.x = parent.width - imageSize - padding;
-      rect.y = parent.height - imageSize - padding;
-
-      parent.appendChild(rect);
+      console.log(`✅ Bild in "Speakerbild" gesetzt für: ${rawText}`);
     } catch (err) {
       console.error(`❌ Fehler beim Laden von ${imageURL}:`, err);
     }
   }
 
-  figma.closePlugin("✅ Bilder wurden geladen und positioniert.");
+  figma.closePlugin("✅ Bilder wurden eingesetzt.");
 }
 
-// 📩 Listener starten
+// 📩 Plugin starten
 runPlugin();
