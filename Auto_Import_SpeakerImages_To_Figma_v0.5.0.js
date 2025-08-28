@@ -1,4 +1,4 @@
-// v0.4.3
+// v0.5.0
 
 const baseURL = "http://localhost:8888/bilder/";
 
@@ -37,7 +37,7 @@ async function runPlugin() {
       continue;
     }
 
-    // Speaker_Firma (irgendwo rekursiv unterhalb von frame)
+    // Speaker_Firma (rekursiv unterhalb von frame)
     const speakerFirmaNode = findSpeakerFirmaNode(frame);
     if (!speakerFirmaNode) {
       console.warn(`⚠️ Kein Speaker_Firma-Knoten gefunden im Frame: ${frame.name}`);
@@ -55,7 +55,6 @@ async function runPlugin() {
     }
 
     const [firstName, lastName] = parts;
-    const fileName = `${lastName}_${firstName}_frei.png`;
 
     // Ordner-Logik
     const firstLetter = lastName[0].toLowerCase();
@@ -74,34 +73,53 @@ async function runPlugin() {
       continue;
     }
 
-    const imageURL = `${baseURL}${folder}${fileName}`;
-    console.log(`⬇️ Lade Bild: ${imageURL}`);
+    // Fallback-Dateinamen
+    const fallbackFileNames = [
+      `${lastName}_${firstName}_frei.png`,
+      `${lastName}_${firstName}_dr_frei.png`,
+      `${lastName}_${firstName}_wp_1024x1024.jpg`,
+      `${lastName}_${firstName}_dr_wp_1024x1024.jpg`
+    ];
 
-    try {
-      const response = await fetch(imageURL);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    let imageLoaded = false;
 
-      const arrayBuffer = await response.arrayBuffer();
-      const image = figma.createImage(new Uint8Array(arrayBuffer));
+    for (const file of fallbackFileNames) {
+      const imageURL = `${baseURL}${folder}${file}`;
+      console.log(`⬇️ Versuche Bild zu laden: ${imageURL}`);
 
-      // Prüfen ob Speakerbild Node Bildfüllung unterstützt
-      const validTypes = ["RECTANGLE", "ELLIPSE", "FRAME", "POLYGON", "STAR"];
-      if (!validTypes.includes(speakerbildNode.type)) {
-        console.warn(`⚠️ "Speakerbild" ist vom Typ "${speakerbildNode.type}" und unterstützt keine Bildfüllung.`);
-        continue;
+      try {
+        const response = await fetch(imageURL);
+        if (!response.ok) {
+          console.warn(`❌ Bild nicht gefunden: ${file} (HTTP ${response.status})`);
+          continue;
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        const image = figma.createImage(new Uint8Array(arrayBuffer));
+
+        const validTypes = ["RECTANGLE", "ELLIPSE", "FRAME", "POLYGON", "STAR"];
+        if (!validTypes.includes(speakerbildNode.type)) {
+          console.warn(`⚠️ "Speakerbild" ist vom Typ "${speakerbildNode.type}" und unterstützt keine Bildfüllung.`);
+          break;
+        }
+
+        speakerbildNode.fills = [{
+          type: "IMAGE",
+          scaleMode: "FILL",
+          imageHash: image.hash,
+        }];
+
+        console.log(`✅ Bild erfolgreich gesetzt: ${file} für ${rawText}`);
+        imageLoaded = true;
+        break;
+
+      } catch (err) {
+        console.error(`❌ Fehler beim Laden von ${imageURL}:`, err);
       }
+    }
 
-      // Bild als Fill setzen
-      speakerbildNode.fills = [{
-        type: "IMAGE",
-        scaleMode: "FILL",
-        imageHash: image.hash,
-      }];
-
-      console.log(`✅ Bild in "Speakerbild" gesetzt für: ${rawText}`);
-
-    } catch (err) {
-      console.error(`❌ Fehler beim Laden von ${imageURL}:`, err);
+    if (!imageLoaded) {
+      console.error(`❌ Kein passendes Bild gefunden für: ${rawText}`);
     }
   }
 
