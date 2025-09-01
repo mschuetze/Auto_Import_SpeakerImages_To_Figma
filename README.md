@@ -16,6 +16,7 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
   - durchsucht die aktuelle Grafik nach einem Bildrahmen mit dem Namen **Speakerbild**
   - falls gefunden:
     - lädt das entsprechende Speakerbild und platziert es automatisch in dem Bildrahmen
+    - ergänzt den Nachnamen in der Frame-Bezeichnung, damit die Grafik nach dem Export eindeutig/besser zuzuordnen ist
 
 ## Voraussetzungen
 ### 1. Figma Desktop-App
