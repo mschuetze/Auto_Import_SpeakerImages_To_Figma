@@ -1,4 +1,4 @@
-// v0.5.0
+// v0.6.0
 
 const baseURL = "http://localhost:8888/bilder/";
 
@@ -111,6 +111,11 @@ async function runPlugin() {
 
         console.log(`✅ Bild erfolgreich gesetzt: ${file} für ${rawText}`);
         imageLoaded = true;
+
+        // 🆕 Frame-Namen anpassen
+        frame.name = `${frame.name}_${lastName}`;
+        console.log(`✏️ Frame-Name geändert zu: ${frame.name}`);
+
         break;
 
       } catch (err) {
@@ -123,7 +128,7 @@ async function runPlugin() {
     }
   }
 
-  figma.closePlugin("✅ Bilder wurden eingesetzt.");
+  figma.closePlugin("✅ Bilder wurden eingesetzt und Frame-Namen angepasst.");
 }
 
 // Plugin starten
