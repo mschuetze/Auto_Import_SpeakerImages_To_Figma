@@ -1,8 +1,48 @@
-// v0.6.0
+// v0.7.0
 
+figma.showUI(__html__, { width: 400, height: 300 });
+
+// Alle SECTION-Knoten sammeln
+const allSections = figma.root.findAll(n => n.type === "SECTION");
+
+// Liste von Namen und IDs an die UI senden
+figma.ui.postMessage({
+  type: "init",
+  sections: allSections.map(section => ({
+    id: section.id,
+    name: section.name
+  }))
+});
+
+figma.ui.onmessage = async (msg) => {
+  if (msg.type === 'run-plugin') {
+    const selectedSectionIds = msg.selectedSectionIds;
+
+    // Finde alle Frames innerhalb der ausgewählten Sections
+    const selectedSections = selectedSectionIds
+      .map(id => figma.getNodeById(id))
+      .filter(node => node && node.type === "SECTION");
+
+    const targetFrames = [];
+
+    for (const section of selectedSections) {
+      const framesInSection = section.children.filter(child =>
+        child.type === "FRAME" &&
+        child.children.some(c => c.name === "Speakerbild")
+      );
+      targetFrames.push(...framesInSection);
+    }
+
+    await runPlugin(targetFrames);
+    figma.closePlugin("✅ Bilder wurden eingesetzt und Frame-Namen angepasst.");
+  }
+};
+
+// ======================
+// Dein bestehender Code als Funktion, angepasst auf targetFrames
+// ======================
 const baseURL = "http://localhost:8888/bilder/";
 
-// Umlautersetzung
 function replaceUmlauts(str) {
   return str
     .replace(/ä/g, "ae")
@@ -14,49 +54,26 @@ function replaceUmlauts(str) {
     .replace(/ß/g, "ss");
 }
 
-// Hilfsfunktion: Findet rekursiv den Text-Knoten "Speaker_Firma" in einem Frame
 function findSpeakerFirmaNode(frame) {
   return frame.findOne(node => node.name === "Speaker_Firma" && node.type === "TEXT");
 }
 
-// Hauptfunktion
-async function runPlugin() {
-  console.log("▶️ Plugin gestartet");
-
-  // Alle Frames finden, die ein Kind "Speakerbild" haben
-  const graphicFrames = figma.currentPage.findAll(node =>
-    node.type === "FRAME" &&
-    node.children.some(child => child.name === "Speakerbild")
-  );
-
+async function runPlugin(graphicFrames) {
   for (const frame of graphicFrames) {
-    // Direktes Kind "Speakerbild"
     const speakerbildNode = frame.children.find(child => child.name === "Speakerbild");
-    if (!speakerbildNode) {
-      console.warn(`⚠️ Kein Speakerbild-Knoten gefunden im Frame: ${frame.name}`);
-      continue;
-    }
+    if (!speakerbildNode) continue;
 
-    // Speaker_Firma (rekursiv unterhalb von frame)
     const speakerFirmaNode = findSpeakerFirmaNode(frame);
-    if (!speakerFirmaNode) {
-      console.warn(`⚠️ Kein Speaker_Firma-Knoten gefunden im Frame: ${frame.name}`);
-      continue;
-    }
+    if (!speakerFirmaNode) continue;
 
     const rawText = speakerFirmaNode.characters.trim();
     const speakerName = rawText.split("(")[0].trim();
     const cleaned = replaceUmlauts(speakerName);
     const parts = cleaned.split(/\s+/);
 
-    if (parts.length < 2) {
-      console.log(`❗ Unvollständiger Name bei: "${rawText}"`);
-      continue;
-    }
+    if (parts.length < 2) continue;
 
     const [firstName, lastName] = parts;
-
-    // Ordner-Logik
     const firstLetter = lastName[0].toLowerCase();
     let folder = "";
     if ("abc".includes(firstLetter)) folder = "abc/";
@@ -68,12 +85,8 @@ async function runPlugin() {
     else if ("st".includes(firstLetter)) folder = "st/";
     else if ("uvw".includes(firstLetter)) folder = "uvw/";
     else if ("xyz".includes(firstLetter)) folder = "xyz/";
-    else {
-      console.warn(`⚠️ Unbekannter Anfangsbuchstabe: "${firstLetter}" bei "${rawText}"`);
-      continue;
-    }
+    else continue;
 
-    // Fallback-Dateinamen
     const fallbackFileNames = [
       `${lastName}_${firstName}_frei.png`,
       `${lastName}_${firstName}_dr_frei.png`,
@@ -85,23 +98,16 @@ async function runPlugin() {
 
     for (const file of fallbackFileNames) {
       const imageURL = `${baseURL}${folder}${file}`;
-      console.log(`⬇️ Versuche Bild zu laden: ${imageURL}`);
 
       try {
         const response = await fetch(imageURL);
-        if (!response.ok) {
-          console.warn(`❌ Bild nicht gefunden: ${file} (HTTP ${response.status})`);
-          continue;
-        }
+        if (!response.ok) continue;
 
         const arrayBuffer = await response.arrayBuffer();
         const image = figma.createImage(new Uint8Array(arrayBuffer));
 
         const validTypes = ["RECTANGLE", "ELLIPSE", "FRAME", "POLYGON", "STAR"];
-        if (!validTypes.includes(speakerbildNode.type)) {
-          console.warn(`⚠️ "Speakerbild" ist vom Typ "${speakerbildNode.type}" und unterstützt keine Bildfüllung.`);
-          break;
-        }
+        if (!validTypes.includes(speakerbildNode.type)) break;
 
         speakerbildNode.fills = [{
           type: "IMAGE",
@@ -109,27 +115,13 @@ async function runPlugin() {
           imageHash: image.hash,
         }];
 
-        console.log(`✅ Bild erfolgreich gesetzt: ${file} für ${rawText}`);
-        imageLoaded = true;
-
-        // 🆕 Frame-Namen anpassen
         frame.name = `${frame.name}_${lastName}`;
-        console.log(`✏️ Frame-Name geändert zu: ${frame.name}`);
-
+        imageLoaded = true;
         break;
 
       } catch (err) {
-        console.error(`❌ Fehler beim Laden von ${imageURL}:`, err);
+        console.error(`Fehler beim Laden: ${imageURL}`, err);
       }
     }
-
-    if (!imageLoaded) {
-      console.error(`❌ Kein passendes Bild gefunden für: ${rawText}`);
-    }
   }
-
-  figma.closePlugin("✅ Bilder wurden eingesetzt und Frame-Namen angepasst.");
 }
-
-// Plugin starten
-runPlugin();

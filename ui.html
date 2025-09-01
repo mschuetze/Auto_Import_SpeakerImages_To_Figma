@@ -1,3 +1,49 @@
-<!-- ui.html -->
 <!DOCTYPE html>
-<html><body></body></html>
+<html>
+  <head>
+    <style>
+      body { font-family: sans-serif; padding: 16px; }
+      label { display: block; margin: 8px 0; }
+      button { margin-top: 16px; }
+    </style>
+  </head>
+  <body>
+    <h3>Wähle die Sections aus:</h3>
+    <form id="sectionForm">
+      <!-- Dynamisch befüllt -->
+    </form>
+    <button id="runBtn">Plugin starten</button>
+
+    <script>
+      const form = document.getElementById('sectionForm');
+      const runBtn = document.getElementById('runBtn');
+
+      onmessage = (event) => {
+        const { type, sections } = event.data.pluginMessage;
+        if (type === 'init') {
+          sections.forEach(section => {
+            const label = document.createElement('label');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = section.id;
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(" " + section.name));
+            form.appendChild(label);
+          });
+        }
+      };
+
+      runBtn.onclick = () => {
+        const selected = Array.from(form.querySelectorAll('input[type="checkbox"]:checked'))
+          .map(cb => cb.value);
+
+        parent.postMessage({
+          pluginMessage: {
+            type: 'run-plugin',
+            selectedSectionIds: selected
+          }
+        }, '*');
+      };
+    </script>
+  </body>
+</html>
