@@ -78,7 +78,9 @@ Zunächst müssen alle [Voraussetzungen](#voraussetzungen) erfüllt sein.
 - Figma Desktop-App öffnen
 - Datei mit den Programmgrafiken öffnen
 - Plugin-Übersicht aufrufen via Menüleiste am oberen Rand: `Plugins > Manage plugins…`
+![alt text](https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/blob/main/Bilder/figma2.png)
 - Plugin **Auto_Import_SpeakerImages_To_Figma** anklicken
+![alt text](https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/blob/main/Bilder/figma3.png)
 
 ## Plugin aktualisieren
 Wenn eine neuere Version des Plugins verfügbar ist, müssen folgende Schritte erledigt werden, um es korrekt einzubinden:
@@ -86,6 +88,7 @@ Wenn eine neuere Version des Plugins verfügbar ist, müssen folgende Schritte e
   - Figma Desktop-App öffnen
   - Plugin-Übersicht aufrufen via Menüleiste am oberen Rand: `Plugins > Manage plugins…`
   - Plugin deinstallieren via: `Hamburger-Menü (3 Punkte) > Remove`
+  ![alt text](https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/blob/main/Bilder/figma4.png)
 2. **neuestes Plugin herunterladen**
   - neuesten Release herunterladen: https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/releases
   - entzippten Ordner unter folgendem Pfad ablegen/ersetzen/ggf. alten löschen: `/Benutzer/[EuerBenutzer]/Dokumente/Skripte/`
