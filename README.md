@@ -67,6 +67,8 @@ Zunächst müssen alle [Voraussetzungen](#voraussetzungen) erfüllt sein.
 - Datei mit den Programmgrafiken öffnen
 - via Menüleiste am oberen Rand: `Plugins > Development > Import plugin from manifest…`
   - Datei **manifest.json** im abgelegten Github-Ordner auswählen: `/Benutzer/[EuerBenutzer]/Dokumente/Skripte/Auto_Import_SpeakerImages_To_Figma/manifest.json`
+    ![alt text](https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/blob/main/Bilder/figma1.png)
+
 - das Plugin ist nun installiert und kann verwendet werden
 
 ## Plugin verwenden
