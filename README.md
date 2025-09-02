@@ -71,9 +71,10 @@ Zunächst müssen alle [Voraussetzungen](#voraussetzungen) erfüllt sein.
 - das Plugin ist nun installiert und kann verwendet werden
 
 ## Plugin verwenden
-- Verbindung zu GRAFIK-Server herstellen
+- Verbindung zu GRAFIK-Server herstellen (z.B. via VPN-Client)
 - App **MAMP** starten
   - Webserver per START-Icon starten
+    ![alt text](https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/blob/main/Bilder/mamp1.png)
 - Figma Desktop-App öffnen
 - Datei mit den Programmgrafiken öffnen
 - Plugin-Übersicht aufrufen via Menüleiste am oberen Rand: `Plugins > Manage plugins…`
