@@ -58,6 +58,7 @@ Figma-Plugins dürfen aus Sicherheitsgründen keine lokalen Dateien laden. Wir u
   - App **MAMP** starten: */Programme/MAMP/MAMP*
     - nach Start Rechtsklick auf Icon im Dock: `Optionen > Im Dock behalten`
   - Webserver in MAMP per START-Icon (oben rechts) starten
+  ![alt text](https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/blob/main/Bilder/mamp1.png)
 
 ## Plugin installieren
 Zunächst müssen alle [Voraussetzungen](#voraussetzungen) erfüllt sein.
