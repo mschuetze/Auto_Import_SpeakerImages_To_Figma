@@ -1,4 +1,4 @@
-// v0.7.0
+// v0.8.0
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -39,8 +39,9 @@ figma.ui.onmessage = async (msg) => {
 };
 
 // ======================
-// Dein bestehender Code als Funktion, angepasst auf targetFrames
+// Hilfsfunktionen
 // ======================
+
 const baseURL = "http://localhost:8888/bilder/";
 
 function replaceUmlauts(str) {
@@ -54,27 +55,40 @@ function replaceUmlauts(str) {
     .replace(/ß/g, "ss");
 }
 
-function findSpeakerFirmaNode(frame) {
-  return frame.findOne(node => node.name === "Speaker_Firma" && node.type === "TEXT");
+function findSpeakerName(frame) {
+  const firmaNode = frame.findOne(n => n.name === "Speaker_Firma" && n.type === "TEXT");
+  if (firmaNode) {
+    const raw = firmaNode.characters.trim();
+    return raw.split("(")[0].trim(); // Nur Name extrahieren
+  }
+
+  const speakerNode = frame.findOne(n => n.name === "Speaker" && n.type === "TEXT");
+  if (speakerNode) {
+    return speakerNode.characters.trim(); // Kein Extrahieren nötig
+  }
+
+  return null;
 }
+
+// ======================
+// Hauptfunktion
+// ======================
 
 async function runPlugin(graphicFrames) {
   for (const frame of graphicFrames) {
     const speakerbildNode = frame.children.find(child => child.name === "Speakerbild");
     if (!speakerbildNode) continue;
 
-    const speakerFirmaNode = findSpeakerFirmaNode(frame);
-    if (!speakerFirmaNode) continue;
+    const speakerName = findSpeakerName(frame);
+    if (!speakerName) continue;
 
-    const rawText = speakerFirmaNode.characters.trim();
-    const speakerName = rawText.split("(")[0].trim();
     const cleaned = replaceUmlauts(speakerName);
     const parts = cleaned.split(/\s+/);
-
     if (parts.length < 2) continue;
 
     const [firstName, lastName] = parts;
     const firstLetter = lastName[0].toLowerCase();
+
     let folder = "";
     if ("abc".includes(firstLetter)) folder = "abc/";
     else if ("def".includes(firstLetter)) folder = "def/";
@@ -93,8 +107,6 @@ async function runPlugin(graphicFrames) {
       `${lastName}_${firstName}_wp_1024x1024.jpg`,
       `${lastName}_${firstName}_dr_wp_1024x1024.jpg`
     ];
-
-    let imageLoaded = false;
 
     for (const file of fallbackFileNames) {
       const imageURL = `${baseURL}${folder}${file}`;
@@ -116,7 +128,6 @@ async function runPlugin(graphicFrames) {
         }];
 
         frame.name = `${frame.name}_${lastName}`;
-        imageLoaded = true;
         break;
 
       } catch (err) {

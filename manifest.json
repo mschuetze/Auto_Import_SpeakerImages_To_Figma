@@ -2,7 +2,7 @@
   "name": "Auto_Import_SpeakerImages_To_Figma",
   "id": "Auto_Import_SpeakerImages_To_Figma",
   "api": "1.0.0",
-  "main": "Auto_Import_SpeakerImages_To_Figma_v0.7.0.js",
+  "main": "Auto_Import_SpeakerImages_To_Figma_v0.8.0.js",
   "ui": "ui.html",
   "editorType": ["figma"]
 }
