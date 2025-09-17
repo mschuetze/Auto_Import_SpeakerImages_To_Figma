@@ -13,6 +13,7 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 - durchsucht die aktuelle Figma-Seite nach Textfeldern mit dem Namen **Speaker_Firma**
 - falls gefunden:
   - extrahiert daraus den Vor- und Nachnamen
+  - ersetzt Sonderzeichen durch deren ASCII-Pendant
   - erstellt daraus dynamisch einen Bildpfad
   - durchsucht die aktuelle Grafik nach einem Bildrahmen mit dem Namen **Speakerbild**
   - falls gefunden:
