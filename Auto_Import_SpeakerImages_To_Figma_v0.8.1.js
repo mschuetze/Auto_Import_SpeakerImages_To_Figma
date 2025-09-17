@@ -1,4 +1,4 @@
-// v0.8.0
+// v0.8.1
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -52,7 +52,33 @@ function replaceUmlauts(str) {
     .replace(/Ä/g, "Ae")
     .replace(/Ö/g, "Oe")
     .replace(/Ü/g, "Ue")
-    .replace(/ß/g, "ss");
+    .replace(/ß/g, "ss")
+    .replace(/æ/g, "ae")
+    .replace(/Æ/g, "Ae")
+    .replace(/œ/g, "oe")
+    .replace(/Œ/g, "Oe")
+    .replace(/á|à|â|ã|å|ā/g, "a")
+    .replace(/Á|À|Â|Ã|Å|Ā/g, "A")
+    .replace(/é|è|ê|ë|ē/g, "e")
+    .replace(/É|È|Ê|Ë|Ē/g, "E")
+    .replace(/í|ì|î|ï|ī/g, "i")
+    .replace(/Í|Ì|Î|Ï|Ī/g, "I")
+    .replace(/ó|ò|ô|õ|ø|ō/g, "o")
+    .replace(/Ó|Ò|Ô|Õ|Ø|Ō/g, "O")
+    .replace(/ú|ù|û|ū/g, "u")
+    .replace(/Ú|Ù|Û|Ū/g, "U")
+    .replace(/ñ/g, "n")
+    .replace(/Ñ/g, "N")
+    .replace(/ç/g, "c")
+    .replace(/Ç/g, "C")
+    .replace(/ł/g, "l")
+    .replace(/Ł/g, "L")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .replace(/š/g, "s")
+    .replace(/Š/g, "S")
+    .replace(/ž/g, "z")
+    .replace(/Ž/g, "Z");
 }
 
 function findSpeakerName(frame) {
