@@ -10,7 +10,7 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 
 ## Was es tut
 - startet Auswahl-Dialog zum Festlegen, welche SECTIONS das Plugin bearbeiten soll
-- durchsucht die aktuelle Figma-Seite nach Textfeldern mit dem Namen **Speaker_Firma**
+- durchsucht die ausgwählten SECTIONS nach Textfeldern mit dem Namen **Speaker_Firma**
 - falls gefunden:
   - extrahiert daraus den Vor- und Nachnamen
   - ersetzt Sonderzeichen durch deren ASCII-Pendant
