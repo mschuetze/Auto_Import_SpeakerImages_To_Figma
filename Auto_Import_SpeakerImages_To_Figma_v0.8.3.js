@@ -1,4 +1,4 @@
-// v0.8.2
+// v0.8.3
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -153,7 +153,10 @@ async function runPlugin(graphicFrames) {
           imageHash: image.hash,
         }];
 
-        frame.name = `${lastName}_${frame.name}`;
+        if (!frame.name.startsWith(`${lastName}_`)) {
+          frame.name = `${lastName}_${frame.name}`;
+        }
+
         break;
 
       } catch (err) {
