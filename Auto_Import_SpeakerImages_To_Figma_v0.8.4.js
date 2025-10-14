@@ -1,4 +1,4 @@
-// v0.8.3
+// v0.8.4
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -82,13 +82,13 @@ function replaceUmlauts(str) {
 }
 
 function findSpeakerName(frame) {
-  const firmaNode = frame.findOne(n => n.name === "Speaker_Firma" && n.type === "TEXT");
+  const firmaNode = frame.findOne(n => n.name === "item__speakers" && n.type === "TEXT");
   if (firmaNode) {
     const raw = firmaNode.characters.trim();
     return raw.split("(")[0].trim(); // Nur Name extrahieren
   }
 
-  const speakerNode = frame.findOne(n => n.name === "Speaker" && n.type === "TEXT");
+  const speakerNode = frame.findOne(n => n.name === "speaker__name" && n.type === "TEXT");
   if (speakerNode) {
     return speakerNode.characters.trim(); // Kein Extrahieren nötig
   }
