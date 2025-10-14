@@ -1,4 +1,4 @@
-// v0.8.4
+// v0.8.5
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -93,6 +93,7 @@ function findSpeakerName(frame) {
     return speakerNode.characters.trim(); // Kein Extrahieren nötig
   }
 
+  console.error(`❌ Kein Sprechername gefunden im Frame "${frame.name}" (ID: ${frame.id})`);
   return null;
 }
 
