@@ -9,19 +9,20 @@
   </head>
   <body>
     <h3>Wähle die Sections aus:</h3>
-    <form id="sectionForm">
-      <!-- Dynamisch befüllt -->
-    </form>
+    <form id="sectionForm"></form>
     <button id="runBtn">Plugin starten</button>
+
+    <div id="result"></div>
+    <div id="errors" style="color: red; margin-top: 1em;"></div>
 
     <script>
       const form = document.getElementById('sectionForm');
       const runBtn = document.getElementById('runBtn');
 
-      onmessage = (event) => {
-        const { type, sections } = event.data.pluginMessage;
-        if (type === 'init') {
-          sections.forEach(section => {
+      window.onmessage = (event) => {
+        const msg = event.data.pluginMessage;
+        if (msg.type === 'init') {
+          msg.sections.forEach(section => {
             const label = document.createElement('label');
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';

@@ -2,10 +2,8 @@
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
-// Alle SECTION-Knoten sammeln
 const allSections = figma.root.findAll(n => n.type === "SECTION");
 
-// Liste von Namen und IDs an die UI senden
 figma.ui.postMessage({
   type: "init",
   sections: allSections.map(section => ({
@@ -24,7 +22,6 @@ figma.ui.onmessage = async (msg) => {
       .filter(node => node && node.type === "SECTION");
 
     const targetFrames = [];
-
     for (const section of selectedSections) {
       const framesInSection = section.children.filter(child =>
         child.type === "FRAME" &&
@@ -33,7 +30,28 @@ figma.ui.onmessage = async (msg) => {
       targetFrames.push(...framesInSection);
     }
 
-    await runPlugin(targetFrames);
+    // Fehler sammeln
+    const errorMessages = [];
+    await runPlugin(targetFrames, errorMessages);
+
+    // Show error window BEFORE closing plugin
+    figma.showUI(`
+      <html>
+        <body>
+          <h2>Fehler-Protokoll</h2>
+          <div id="errors" style="color:red;margin-bottom:16px;">
+            ${errorMessages.map(e => `<div>${e}</div>`).join("")}
+          </div>
+          <button id="closeBtn" style="padding:8px 16px;">schließen</button>
+          <script>
+            document.getElementById('closeBtn').onclick = () => parent.postMessage({ pluginMessage: { type: 'close-error-window' } }, '*');
+          </script>
+        </body>
+      </html>
+    `, { width: 500, height: 400 });
+  }
+
+  if (msg.type === 'close-error-window') {
     figma.closePlugin("✅ Bilder wurden eingesetzt und Frame-Namen angepasst.");
   }
 };
@@ -81,7 +99,7 @@ function replaceUmlauts(str) {
     .replace(/Ž/g, "Z");
 }
 
-function findSpeakerName(frame) {
+function findSpeakerName(frame, errorMessages) {
   const firmaNode = frame.findOne(n => n.name === "item__speakers" && n.type === "TEXT");
   if (firmaNode) {
     const raw = firmaNode.characters.trim();
@@ -93,7 +111,8 @@ function findSpeakerName(frame) {
     return speakerNode.characters.trim(); // Kein Extrahieren nötig
   }
 
-  console.error(`❌ Kein Sprechername gefunden im Frame "${frame.name}" (ID: ${frame.id})`);
+  const errorMsg = `❌ Keine Text-Ebene mit dem Namen "item__speakers" gefunden im Frame "${frame.name}" (ID: ${frame.id})`;
+  errorMessages.push(errorMsg);
   return null;
 }
 
@@ -101,12 +120,12 @@ function findSpeakerName(frame) {
 // Hauptfunktion
 // ======================
 
-async function runPlugin(graphicFrames) {
+async function runPlugin(graphicFrames, errorMessages) {
   for (const frame of graphicFrames) {
     const speakerbildNode = frame.children.find(child => child.name === "Speakerbild");
     if (!speakerbildNode) continue;
 
-    const speakerName = findSpeakerName(frame);
+    const speakerName = findSpeakerName(frame, errorMessages);
     if (!speakerName) continue;
 
     const cleaned = replaceUmlauts(speakerName);
