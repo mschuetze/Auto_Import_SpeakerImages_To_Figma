@@ -1,4 +1,4 @@
-// v0.8.5
+// v0.9.0
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -147,6 +147,11 @@ async function runPlugin(graphicFrames, errorMessages) {
     else if ("xyz".includes(firstLetter)) folder = "xyz/";
     else continue;
 
+    // Always prefix the frame name with lastname_ (if not already)
+    if (!frame.name.startsWith(`${lastName}_`)) {
+      frame.name = `${lastName}_${frame.name}`;
+    }
+
     const fallbackFileNames = [
       `${lastName}_${firstName}_frei.png`,
       `${lastName}_${firstName}_dr_frei.png`,
@@ -172,10 +177,6 @@ async function runPlugin(graphicFrames, errorMessages) {
           scaleMode: "FILL",
           imageHash: image.hash,
         }];
-
-        if (!frame.name.startsWith(`${lastName}_`)) {
-          frame.name = `${lastName}_${frame.name}`;
-        }
 
         break;
 
