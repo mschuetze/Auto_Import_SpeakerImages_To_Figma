@@ -1,4 +1,4 @@
-// v0.9.0
+// v0.10.0
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -100,20 +100,48 @@ function replaceUmlauts(str) {
 }
 
 function findSpeakerName(frame, errorMessages) {
+  // try to find the standard text nodes
   const firmaNode = frame.findOne(n => n.name === "item__speakers" && n.type === "TEXT");
-  if (firmaNode) {
-    const raw = firmaNode.characters.trim();
-    return raw.split("(")[0].trim(); // Nur Name extrahieren
-  }
-
   const speakerNode = frame.findOne(n => n.name === "speaker__name" && n.type === "TEXT");
-  if (speakerNode) {
-    return speakerNode.characters.trim(); // Kein Extrahieren nötig
+  const node = firmaNode || speakerNode;
+
+  if (!node) {
+    const errorMsg = `❌ Keine Text-Ebene mit dem Namen "item__speakers" oder "speaker__name" gefunden im Frame "${frame.name}" (ID: ${frame.id})`;
+    if (Array.isArray(errorMessages)) errorMessages.push(errorMsg);
+    return null;
   }
 
-  const errorMsg = `❌ Keine Text-Ebene mit dem Namen "item__speakers" gefunden im Frame "${frame.name}" (ID: ${frame.id})`;
-  errorMessages.push(errorMsg);
-  return null;
+  const raw = node.characters.trim();
+  if (!raw) {
+    const errorMsg = `❌ Leerer Sprechertitel im Frame "${frame.name}" (ID: ${frame.id})`;
+    if (Array.isArray(errorMessages)) errorMessages.push(errorMsg);
+    return null;
+  }
+
+  // Schema: "Firstname Lastname | Company" or multiple separated by commas.
+  // Split on commas (companies do not contain commas per schema), then take part before '|'
+  const speakers = raw
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(s => {
+      if (s.indexOf('|') !== -1) {
+        return s.split('|')[0].trim();
+      }
+      // fallback: strip parentheses (e.g. "Name (Company)")
+      return s.replace(/\s*\([^)]*\)/g, '').trim();
+    })
+    .map(s => s.replace(/\s+/g, ' ')) // normalize spaces
+    .filter(Boolean);
+
+  if (speakers.length === 0) {
+    const errorMsg = `❌ Kein gültiger Sprechername gefunden im Frame "${frame.name}" (ID: ${frame.id})`;
+    if (Array.isArray(errorMessages)) errorMessages.push(errorMsg);
+    return null;
+  }
+
+  // return array of "Firstname Lastname" strings
+  return speakers;
 }
 
 // ======================
@@ -125,15 +153,33 @@ async function runPlugin(graphicFrames, errorMessages) {
     const speakerbildNode = frame.children.find(child => child.name === "Speakerbild");
     if (!speakerbildNode) continue;
 
-    const speakerName = findSpeakerName(frame, errorMessages);
+    // NEW: get an ARRAY of speaker names (handles multiple speakers)
+    const speakerNames = findSpeakerName(frame, errorMessages);
+    if (!speakerNames || speakerNames.length === 0) continue;
+
+    // Build concatenated last names: Lastname1Lastname2... and prefix frame.name
+    const lastNamesCombined = speakerNames.map(name => {
+      const cleaned = replaceUmlauts(name).trim();
+      const parts = cleaned.split(/\s+/).filter(Boolean);
+      return parts.length > 1 ? parts[parts.length - 1] : parts[0];
+    }).join('');
+    if (lastNamesCombined) {
+      if (!frame.name.startsWith(`${lastNamesCombined}_`)) {
+        frame.name = `${lastNamesCombined}_${frame.name}`;
+      }
+    }
+
+    // EXISTING IMAGE LOGIC: keep behavior for image insertion (uses first speaker)
+    const speakerName = speakerNames[0];
     if (!speakerName) continue;
 
     const cleaned = replaceUmlauts(speakerName);
-    const parts = cleaned.split(/\s+/);
-    if (parts.length < 2) continue;
+    const parts = cleaned.split(/\s+/).filter(Boolean);
+    if (parts.length < 1) continue;
 
-    const [firstName, lastName] = parts;
-    const firstLetter = lastName[0].toLowerCase();
+    const firstName = parts[0];
+    const lastName = parts.length > 1 ? parts[parts.length - 1] : parts[0];
+    const firstLetter = lastName && lastName.length > 0 ? lastName[0].toLowerCase() : '';
 
     let folder = "";
     if ("abc".includes(firstLetter)) folder = "abc/";
@@ -146,11 +192,6 @@ async function runPlugin(graphicFrames, errorMessages) {
     else if ("uvw".includes(firstLetter)) folder = "uvw/";
     else if ("xyz".includes(firstLetter)) folder = "xyz/";
     else continue;
-
-    // Always prefix the frame name with lastname_ (if not already)
-    if (!frame.name.startsWith(`${lastName}_`)) {
-      frame.name = `${lastName}_${frame.name}`;
-    }
 
     const fallbackFileNames = [
       `${lastName}_${firstName}_frei.png`,
