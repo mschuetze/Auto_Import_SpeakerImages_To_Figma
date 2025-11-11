@@ -1,4 +1,4 @@
-// v0.10.0
+// v0.11.1
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -73,8 +73,8 @@ function replaceUmlauts(str) {
     .replace(/ß/g, "ss")
     .replace(/æ/g, "ae")
     .replace(/Æ/g, "Ae")
-    .replace(/œ/g, "oe")
-    .replace(/Œ/g, "Oe")
+    .replace(/ø/g, "oe")
+    .replace(/Ø/g, "Oe")
     .replace(/á|à|â|ã|å|ā/g, "a")
     .replace(/Á|À|Â|Ã|Å|Ā/g, "A")
     .replace(/é|è|ê|ë|ē/g, "e")
@@ -153,7 +153,7 @@ async function runPlugin(graphicFrames, errorMessages) {
     const speakerbildNode = frame.children.find(child => child.name === "Speakerbild");
     if (!speakerbildNode) continue;
 
-    // NEW: get an ARRAY of speaker names (handles multiple speakers)
+    // Get an ARRAY of speaker names (handles multiple speakers)
     const speakerNames = findSpeakerName(frame, errorMessages);
     if (!speakerNames || speakerNames.length === 0) continue;
 
@@ -169,60 +169,90 @@ async function runPlugin(graphicFrames, errorMessages) {
       }
     }
 
-    // EXISTING IMAGE LOGIC: keep behavior for image insertion (uses first speaker)
-    const speakerName = speakerNames[0];
-    if (!speakerName) continue;
+    // Validate node type once
+    const validTypes = ["RECTANGLE", "ELLIPSE", "FRAME", "POLYGON", "STAR"];
+    if (!validTypes.includes(speakerbildNode.type)) {
+      const errorMsg = `⚠️ Node-Type "${speakerbildNode.type}" nicht unterstützt im Frame "${frame.name}"`;
+      if (Array.isArray(errorMessages)) errorMessages.push(errorMsg);
+      continue;
+    }
 
-    const cleaned = replaceUmlauts(speakerName);
-    const parts = cleaned.split(/\s+/).filter(Boolean);
-    if (parts.length < 1) continue;
+    // STEP 1: Create all required nodes upfront
+    const speakerNodes = [speakerbildNode]; // First speaker uses original
+    for (let i = 1; i < speakerNames.length; i++) {
+      const clonedNode = speakerbildNode.clone();
+      clonedNode.name = `Speakerbild_${i + 1}`;
+      clonedNode.x = speakerbildNode.x + (i * 100);
+      clonedNode.y = speakerbildNode.y;
+      frame.appendChild(clonedNode);
+      speakerNodes.push(clonedNode);
+    }
 
-    const firstName = parts[0];
-    const lastName = parts.length > 1 ? parts[parts.length - 1] : parts[0];
-    const firstLetter = lastName && lastName.length > 0 ? lastName[0].toLowerCase() : '';
+    // STEP 2: Load and place images for all speakers
+    for (let speakerIndex = 0; speakerIndex < speakerNames.length; speakerIndex++) {
+      const speakerName = speakerNames[speakerIndex];
+      const targetNode = speakerNodes[speakerIndex];
+      
+      if (!speakerName) continue;
 
-    let folder = "";
-    if ("abc".includes(firstLetter)) folder = "abc/";
-    else if ("def".includes(firstLetter)) folder = "def/";
-    else if ("ghi".includes(firstLetter)) folder = "ghi/";
-    else if ("jkl".includes(firstLetter)) folder = "jkl/";
-    else if ("mno".includes(firstLetter)) folder = "mno/";
-    else if ("pqr".includes(firstLetter)) folder = "pqr/";
-    else if ("st".includes(firstLetter)) folder = "st/";
-    else if ("uvw".includes(firstLetter)) folder = "uvw/";
-    else if ("xyz".includes(firstLetter)) folder = "xyz/";
-    else continue;
+      // Process speaker name
+      const cleaned = replaceUmlauts(speakerName);
+      const parts = cleaned.split(/\s+/).filter(Boolean);
+      if (parts.length < 1) continue;
 
-    const fallbackFileNames = [
-      `${lastName}_${firstName}_frei.png`,
-      `${lastName}_${firstName}_dr_frei.png`,
-      `${lastName}_${firstName}_wp_1024x1024.jpg`,
-      `${lastName}_${firstName}_dr_wp_1024x1024.jpg`
-    ];
+      const firstName = parts[0];
+      const lastName = parts.length > 1 ? parts[parts.length - 1] : parts[0];
+      const firstLetter = lastName && lastName.length > 0 ? lastName[0].toLowerCase() : '';
 
-    for (const file of fallbackFileNames) {
-      const imageURL = `${baseURL}${folder}${file}`;
+      let folder = "";
+      if ("abc".includes(firstLetter)) folder = "abc/";
+      else if ("def".includes(firstLetter)) folder = "def/";
+      else if ("ghi".includes(firstLetter)) folder = "ghi/";
+      else if ("jkl".includes(firstLetter)) folder = "jkl/";
+      else if ("mno".includes(firstLetter)) folder = "mno/";
+      else if ("pqr".includes(firstLetter)) folder = "pqr/";
+      else if ("st".includes(firstLetter)) folder = "st/";
+      else if ("uvw".includes(firstLetter)) folder = "uvw/";
+      else if ("xyz".includes(firstLetter)) folder = "xyz/";
+      else continue;
 
-      try {
-        const response = await fetch(imageURL);
-        if (!response.ok) continue;
+      const fallbackFileNames = [
+        `${lastName}_${firstName}_frei.png`,
+        `${lastName}_${firstName}_dr_frei.png`,
+        `${lastName}_${firstName}_wp_1024x1024.jpg`,
+        `${lastName}_${firstName}_dr_wp_1024x1024.jpg`
+      ];
 
-        const arrayBuffer = await response.arrayBuffer();
-        const image = figma.createImage(new Uint8Array(arrayBuffer));
+      // Try to load image from fallback list
+      let imageLoaded = false;
+      for (const file of fallbackFileNames) {
+        const imageURL = `${baseURL}${folder}${file}`;
 
-        const validTypes = ["RECTANGLE", "ELLIPSE", "FRAME", "POLYGON", "STAR"];
-        if (!validTypes.includes(speakerbildNode.type)) break;
+        try {
+          const response = await fetch(imageURL);
+          if (!response.ok) continue;
 
-        speakerbildNode.fills = [{
-          type: "IMAGE",
-          scaleMode: "FILL",
-          imageHash: image.hash,
-        }];
+          const arrayBuffer = await response.arrayBuffer();
+          const image = figma.createImage(new Uint8Array(arrayBuffer));
 
-        break;
+          targetNode.fills = [{
+            type: "IMAGE",
+            scaleMode: "FILL",
+            imageHash: image.hash,
+          }];
 
-      } catch (err) {
-        console.error(`Fehler beim Laden: ${imageURL}`, err);
+          imageLoaded = true;
+          break; // Image found, stop trying fallbacks
+
+        } catch (err) {
+          console.error(`Fehler beim Laden: ${imageURL}`, err);
+        }
+      }
+
+      // Log if no image was found for this speaker
+      if (!imageLoaded) {
+        const errorMsg = `⚠️ Kein Bild gefunden für Speaker "${speakerName}" im Frame "${frame.name}"`;
+        if (Array.isArray(errorMessages)) errorMessages.push(errorMsg);
       }
     }
   }
