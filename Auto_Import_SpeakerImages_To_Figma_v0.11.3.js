@@ -1,4 +1,4 @@
-// v0.11.1
+// v0.11.3
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -16,7 +16,6 @@ figma.ui.onmessage = async (msg) => {
   if (msg.type === 'run-plugin') {
     const selectedSectionIds = msg.selectedSectionIds;
 
-    // Finde alle Frames innerhalb der ausgewählten Sections
     const selectedSections = selectedSectionIds
       .map(id => figma.getNodeById(id))
       .filter(node => node && node.type === "SECTION");
@@ -30,16 +29,14 @@ figma.ui.onmessage = async (msg) => {
       targetFrames.push(...framesInSection);
     }
 
-    // Fehler sammeln
     const errorMessages = [];
     await runPlugin(targetFrames, errorMessages);
 
-    // Show error window BEFORE closing plugin
     figma.showUI(`
       <html>
-        <body>
+        <body style="font-family:sans-serif;">
           <h2>Fehler-Protokoll</h2>
-          <div id="errors" style="color:red;margin-bottom:16px;">
+          <div id="errors" style="color:red;margin-bottom:16px;white-space:pre-wrap;">
             ${errorMessages.map(e => `<div>${e}</div>`).join("")}
           </div>
           <button id="closeBtn" style="padding:8px 16px;">schließen</button>
@@ -48,7 +45,7 @@ figma.ui.onmessage = async (msg) => {
           </script>
         </body>
       </html>
-    `, { width: 500, height: 400 });
+    `, { width: 600, height: 500 });
   }
 
   if (msg.type === 'close-error-window') {
@@ -100,7 +97,6 @@ function replaceUmlauts(str) {
 }
 
 function findSpeakerName(frame, errorMessages) {
-  // try to find the standard text nodes
   const firmaNode = frame.findOne(n => n.name === "item__speakers" && n.type === "TEXT");
   const speakerNode = frame.findOne(n => n.name === "speaker__name" && n.type === "TEXT");
   const node = firmaNode || speakerNode;
@@ -118,8 +114,6 @@ function findSpeakerName(frame, errorMessages) {
     return null;
   }
 
-  // Schema: "Firstname Lastname | Company" or multiple separated by commas.
-  // Split on commas (companies do not contain commas per schema), then take part before '|'
   const speakers = raw
     .split(',')
     .map(s => s.trim())
@@ -128,10 +122,9 @@ function findSpeakerName(frame, errorMessages) {
       if (s.indexOf('|') !== -1) {
         return s.split('|')[0].trim();
       }
-      // fallback: strip parentheses (e.g. "Name (Company)")
       return s.replace(/\s*\([^)]*\)/g, '').trim();
     })
-    .map(s => s.replace(/\s+/g, ' ')) // normalize spaces
+    .map(s => s.replace(/\s+/g, ' '))
     .filter(Boolean);
 
   if (speakers.length === 0) {
@@ -140,7 +133,6 @@ function findSpeakerName(frame, errorMessages) {
     return null;
   }
 
-  // return array of "Firstname Lastname" strings
   return speakers;
 }
 
@@ -153,11 +145,9 @@ async function runPlugin(graphicFrames, errorMessages) {
     const speakerbildNode = frame.children.find(child => child.name === "Speakerbild");
     if (!speakerbildNode) continue;
 
-    // Get an ARRAY of speaker names (handles multiple speakers)
     const speakerNames = findSpeakerName(frame, errorMessages);
     if (!speakerNames || speakerNames.length === 0) continue;
 
-    // Build concatenated last names: Lastname1Lastname2... and prefix frame.name
     const lastNamesCombined = speakerNames.map(name => {
       const cleaned = replaceUmlauts(name).trim();
       const parts = cleaned.split(/\s+/).filter(Boolean);
@@ -169,7 +159,6 @@ async function runPlugin(graphicFrames, errorMessages) {
       }
     }
 
-    // Validate node type once
     const validTypes = ["RECTANGLE", "ELLIPSE", "FRAME", "POLYGON", "STAR"];
     if (!validTypes.includes(speakerbildNode.type)) {
       const errorMsg = `⚠️ Node-Type "${speakerbildNode.type}" nicht unterstützt im Frame "${frame.name}"`;
@@ -177,8 +166,7 @@ async function runPlugin(graphicFrames, errorMessages) {
       continue;
     }
 
-    // STEP 1: Create all required nodes upfront
-    const speakerNodes = [speakerbildNode]; // First speaker uses original
+    const speakerNodes = [speakerbildNode];
     for (let i = 1; i < speakerNames.length; i++) {
       const clonedNode = speakerbildNode.clone();
       clonedNode.name = `Speakerbild_${i + 1}`;
@@ -188,15 +176,13 @@ async function runPlugin(graphicFrames, errorMessages) {
       speakerNodes.push(clonedNode);
     }
 
-    // STEP 2: Load and place images for all speakers
     for (let speakerIndex = 0; speakerIndex < speakerNames.length; speakerIndex++) {
       const speakerName = speakerNames[speakerIndex];
       const targetNode = speakerNodes[speakerIndex];
-      
       if (!speakerName) continue;
 
-      // Process speaker name
-      const cleaned = replaceUmlauts(speakerName);
+      // 🔠 Namen vereinheitlichen
+      const cleaned = replaceUmlauts(speakerName).toLowerCase(); // <-- [v0.11.3] alles klein
       const parts = cleaned.split(/\s+/).filter(Boolean);
       if (parts.length < 1) continue;
 
@@ -216,17 +202,20 @@ async function runPlugin(graphicFrames, errorMessages) {
       else if ("xyz".includes(firstLetter)) folder = "xyz/";
       else continue;
 
+      // 🔠 Alle Dateinamen klein
       const fallbackFileNames = [
         `${lastName}_${firstName}_frei.png`,
         `${lastName}_${firstName}_dr_frei.png`,
         `${lastName}_${firstName}_wp_1024x1024.jpg`,
         `${lastName}_${firstName}_dr_wp_1024x1024.jpg`
-      ];
+      ].map(fn => fn.toLowerCase()); // <-- [v0.11.3]
 
-      // Try to load image from fallback list
       let imageLoaded = false;
+      const triedFiles = [];
+
       for (const file of fallbackFileNames) {
         const imageURL = `${baseURL}${folder}${file}`;
+        triedFiles.push(imageURL);
 
         try {
           const response = await fetch(imageURL);
@@ -234,24 +223,22 @@ async function runPlugin(graphicFrames, errorMessages) {
 
           const arrayBuffer = await response.arrayBuffer();
           const image = figma.createImage(new Uint8Array(arrayBuffer));
-
           targetNode.fills = [{
             type: "IMAGE",
             scaleMode: "FILL",
             imageHash: image.hash,
           }];
-
           imageLoaded = true;
-          break; // Image found, stop trying fallbacks
-
+          break;
         } catch (err) {
           console.error(`Fehler beim Laden: ${imageURL}`, err);
         }
       }
 
-      // Log if no image was found for this speaker
       if (!imageLoaded) {
-        const errorMsg = `⚠️ Kein Bild gefunden für Speaker "${speakerName}" im Frame "${frame.name}"`;
+        const errorMsg =
+          `⚠️ Kein Bild gefunden für Speaker "${speakerName}" im Frame "${frame.name}"\n` +
+          `→ getestete Dateien:\n${triedFiles.map(f => '   • ' + f).join('\n')}`;
         if (Array.isArray(errorMessages)) errorMessages.push(errorMsg);
       }
     }
