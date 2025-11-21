@@ -1,50 +1,106 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-      body { font-family: sans-serif; padding: 16px; }
-      label { display: block; margin: 8px 0; }
-      button { margin-top: 16px; }
-    </style>
-  </head>
-  <body>
-    <h3>Wähle die Sections aus:</h3>
-    <form id="sectionForm"></form>
-    <button id="runBtn">Plugin starten</button>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 16px;
+    }
+    #select, #progress, #done {
+      display: none;
+    }
+    button {
+      padding: 8px 14px;
+      margin-top: 12px;
+    }
+    .errorline {
+      white-space: pre-wrap;
+      margin-bottom: 8px;
+      color: #b00;
+    }
+  </style>
+</head>
+<body>
 
-    <div id="result"></div>
-    <div id="errors" style="color: red; margin-top: 1em;"></div>
+  <!-- Section-Auswahl -->
+  <div id="select">
+    <h2>Section auswählen</h2>
+    <p>Bitte eine Section wählen:</p>
+    <select id="sectionSelect" size="6" style="width:100%"></select>
+    <button id="run">Plugin starten</button>
+  </div>
 
-    <script>
-      const form = document.getElementById('sectionForm');
-      const runBtn = document.getElementById('runBtn');
+  <!-- Fortschritt -->
+  <div id="progress">
+    <h2>Bitte warten…</h2>
+    <p>Das Plugin arbeitet.</p>
+  </div>
 
-      window.onmessage = (event) => {
-        const msg = event.data.pluginMessage;
-        if (msg.type === 'init') {
-          msg.sections.forEach(section => {
-            const label = document.createElement('label');
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.value = section.id;
-            label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(" " + section.name));
-            form.appendChild(label);
-          });
-        }
-      };
+  <!-- Fehlerprotokoll -->
+  <div id="done">
+    <h2>Fehler-Protokoll</h2>
+    <div id="errcontainer"></div>
+    <button id="close">Schließen</button>
+  </div>
 
-      runBtn.onclick = () => {
-        const selected = Array.from(form.querySelectorAll('input[type="checkbox"]:checked'))
-          .map(cb => cb.value);
+<script>
+  const $ = (s) => document.querySelector(s);
 
-        parent.postMessage({
-          pluginMessage: {
-            type: 'run-plugin',
-            selectedSectionIds: selected
-          }
-        }, '*');
-      };
-    </script>
-  </body>
+  onmessage = (ev) => {
+    const msg = ev.data.pluginMessage;
+
+    if (msg.type === "init") {
+      $("#select").style.display = "block";
+      $("#progress").style.display = "none";
+      $("#done").style.display = "none";
+
+      const sel = $("#sectionSelect");
+      sel.innerHTML = "";
+      msg.sections.forEach(sec => {
+        const opt = document.createElement("option");
+        opt.value = sec.id;
+        opt.textContent = sec.name;
+        sel.appendChild(opt);
+      });
+    }
+
+    if (msg.type === "progress") {
+      $("#select").style.display = "none";
+      $("#progress").style.display = "block";
+      $("#done").style.display = "none";
+    }
+
+    if (msg.type === "done") {
+      $("#select").style.display = "none";
+      $("#progress").style.display = "none";
+      $("#done").style.display = "block";
+
+      const cont = $("#errcontainer");
+      cont.innerHTML = "";
+
+      if (msg.errors.length === 0) {
+        cont.innerHTML = "<p>Keine Fehler 🎉</p>";
+      } else {
+        msg.errors.forEach(err => {
+          const d = document.createElement("div");
+          d.className = "errorline";
+          d.textContent = err;
+          cont.appendChild(d);
+        });
+      }
+    }
+  };
+
+  $("#run").onclick = () => {
+    const ids = Array.from($("#sectionSelect").selectedOptions).map(o => o.value);
+    parent.postMessage({ pluginMessage: { type: "run-plugin", selectedSectionIds: ids } }, "*");
+  };
+
+  $("#close").onclick = () => {
+    parent.postMessage({ pluginMessage: { type: "close-error-window" } }, "*");
+  };
+</script>
+
+</body>
 </html>
