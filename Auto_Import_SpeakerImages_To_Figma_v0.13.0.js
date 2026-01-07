@@ -1,4 +1,4 @@
-// v0.12.1
+// v0.13.0
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -97,11 +97,18 @@ function cleanFirstName(firstName) {
 }
 
 function getSpeakerData(frame, errors) {
-  const firstNameNode = frame.findOne(n => n.name === "item__firstName" && n.type === "TEXT");
-  const lastNameNode = frame.findOne(n => n.name === "item__lastName" && n.type === "TEXT");
+  const firstNameNode = frame.findOne(n =>
+    (n.name === "item__firstName" || n.name === "speaker__firstName") && n.type === "TEXT"
+  );
+
+  const lastNameNode = frame.findOne(n =>
+    (n.name === "item__lastName" || n.name === "speaker__lastName") && n.type === "TEXT"
+  );
 
   if (!firstNameNode || !lastNameNode) {
-    errors.push(`❌ "item__firstName" oder "item__lastName" fehlt im Frame "${frame.name}"`);
+    errors.push(
+      `❌ "item__firstName/speaker__firstName" oder "item__lastName/speaker__lastName" fehlt im Frame "${frame.name}"`
+    );
     return null;
   }
 
@@ -138,9 +145,13 @@ async function runPlugin(frames, errors) {
       frame.name = `${lastNamesCombined}_${frame.name}`;
     }
 
-    // Hilfstexte löschen
-    frame.findAll(n => n.name === "item__firstName").forEach(n => n.remove());
-    frame.findAll(n => n.name === "item__lastName").forEach(n => n.remove());
+    // Hilfstexte löschen (unterstütze item__* und speaker__* Varianten)
+    frame
+      .findAll(n => n.name === "item__firstName" || n.name === "speaker__firstName")
+      .forEach(n => n.remove());
+    frame
+      .findAll(n => n.name === "item__lastName" || n.name === "speaker__lastName")
+      .forEach(n => n.remove());
 
     // Für mehrere Speaker klonen
     const nodes = [speakerbild];
