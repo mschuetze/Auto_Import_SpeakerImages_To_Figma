@@ -1,4 +1,4 @@
-// v0.13.0
+// v0.14.0
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -141,8 +141,8 @@ async function runPlugin(frames, errors) {
 
     // Frame-Namen zur Orientierung erweitern
     const lastNamesCombined = speakers.map(s => cleanLastName(s.lastName)).join("-");
-    if (!frame.name.startsWith(`${lastNamesCombined}_`)) {
-      frame.name = `${lastNamesCombined}_${frame.name}`;
+    if (!frame.name.startsWith(`${lastNamesCombined} / `)) {
+      frame.name = `${lastNamesCombined} / ${frame.name}`;
     }
 
     // Hilfstexte löschen (unterstütze item__* und speaker__* Varianten)
