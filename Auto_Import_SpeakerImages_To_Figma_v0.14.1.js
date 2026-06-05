@@ -1,4 +1,4 @@
-// v0.14.0
+// v0.14.1
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -139,8 +139,13 @@ async function runPlugin(frames, errors) {
     const speakers = getSpeakerData(frame, errors);
     if (!speakers) continue;
 
-    // Frame-Namen zur Orientierung erweitern
+    // Frame-Namen um Namen der Speaker erweitern
     const lastNamesCombined = speakers.map(s => cleanLastName(s.lastName)).join("-");
+    // Zuerst Frame-Namen mit Nachnamen präfixieren, wenn noch nicht geschehen
+    if (!frame.name.startsWith(`${lastNamesCombined}_`)) {
+      frame.name = `${lastNamesCombined}_${frame.name}`;
+    }
+    // Dann mit "/" separator präfixieren, wenn noch nicht geschehen
     if (!frame.name.startsWith(`${lastNamesCombined} / `)) {
       frame.name = `${lastNamesCombined} / ${frame.name}`;
     }
