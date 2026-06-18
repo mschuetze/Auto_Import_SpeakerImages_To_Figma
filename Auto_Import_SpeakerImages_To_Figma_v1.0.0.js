@@ -1,4 +1,4 @@
-// v0.14.1
+// v1.0.0
 
 figma.showUI(__html__, { width: 400, height: 300 });
 
@@ -140,14 +140,14 @@ async function runPlugin(frames, errors) {
     if (!speakers) continue;
 
     // Frame-Namen um Namen der Speaker erweitern
-    const lastNamesCombined = speakers.map(s => cleanLastName(s.lastName)).join("-");
-    // Zuerst Frame-Namen mit Nachnamen präfixieren, wenn noch nicht geschehen
-    if (!frame.name.startsWith(`${lastNamesCombined}_`)) {
-      frame.name = `${lastNamesCombined}_${frame.name}`;
+    const NamesCombined = speakers.map(s => `${cleanLastName(s.lastName)}_${cleanFirstName(s.firstName)}`).join("+");
+    // Zuerst Frame-Namen mit Vor- und Nachnamen präfixieren, wenn noch nicht geschehen
+    if (!frame.name.startsWith(`${NamesCombined}_`)) {
+      frame.name = `${NamesCombined}_${frame.name}`;
     }
     // Dann mit "/" separator präfixieren, wenn noch nicht geschehen
-    if (!frame.name.startsWith(`${lastNamesCombined} / `)) {
-      frame.name = `${lastNamesCombined} / ${frame.name}`;
+    if (!frame.name.startsWith(`${NamesCombined} / `)) {
+      frame.name = `${NamesCombined} / ${frame.name}`;
     }
 
     // Hilfstexte löschen (unterstütze item__* und speaker__* Varianten)
