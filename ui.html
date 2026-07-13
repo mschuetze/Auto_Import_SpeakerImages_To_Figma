@@ -6,35 +6,63 @@
     body {
       font-family: sans-serif;
       padding: 16px;
+      background: #fff;
+      color: #111;
     }
-    #select, #progress, #done {
+    #select, #done {
       display: none;
+    }
+    #progress {
+      display: block;
     }
     button {
       padding: 8px 14px;
       margin-top: 12px;
+    }
+    .field {
+      margin-top: 10px;
+    }
+    .field label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .field input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
     }
     .errorline {
       white-space: pre-wrap;
       margin-bottom: 8px;
       color: #b00;
     }
+    .hint {
+      margin-top: 6px;
+      color: #b00;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Fortschritt -->
+  <div id="progress" style="display:block;">
+    <h2>Bitte warten…</h2>
+    <p>Das Skript arbeitet.</p>
+  </div>
 
   <!-- Section-Auswahl -->
   <div id="select">
     <h2>Section auswählen</h2>
     <p>Bitte eine Section wählen:</p>
     <select id="sectionSelect" size="6" style="width:100%"></select>
+    <div class="field">
+      <label for="conferencePrefix">Konferenzpräfix</label>
+      <input id="conferencePrefix" type="text" placeholder="z.B. DOC_NY26" />
+      <div id="conferencePrefixHint" class="hint" style="display:none;">Bitte einen Konferenzpräfix eingeben.</div>
+    </div>
     <button id="run">Plugin starten</button>
-  </div>
-
-  <!-- Fortschritt -->
-  <div id="progress">
-    <h2>Bitte warten…</h2>
-    <p>Das Plugin arbeitet.</p>
   </div>
 
   <!-- Fehlerprotokoll -->
@@ -47,13 +75,19 @@
 <script>
   const $ = (s) => document.querySelector(s);
 
+  function showView(view) {
+    ["#select", "#progress", "#done"].forEach(id => {
+      $(id).style.display = id === `#${view}` ? "block" : "none";
+    });
+  }
+
+  showView("progress");
+
   onmessage = (ev) => {
     const msg = ev.data.pluginMessage;
 
     if (msg.type === "init") {
-      $("#select").style.display = "block";
-      $("#progress").style.display = "none";
-      $("#done").style.display = "none";
+      showView("select");
 
       const sel = $("#sectionSelect");
       sel.innerHTML = "";
@@ -66,15 +100,11 @@
     }
 
     if (msg.type === "progress") {
-      $("#select").style.display = "none";
-      $("#progress").style.display = "block";
-      $("#done").style.display = "none";
+      showView("progress");
     }
 
     if (msg.type === "done") {
-      $("#select").style.display = "none";
-      $("#progress").style.display = "none";
-      $("#done").style.display = "block";
+      showView("done");
 
       const cont = $("#errcontainer");
       cont.innerHTML = "";
@@ -93,8 +123,22 @@
   };
 
   $("#run").onclick = () => {
+    const conferencePrefix = $("#conferencePrefix").value.trim();
+    const hint = $("#conferencePrefixHint");
+
+    if (!conferencePrefix) {
+      hint.style.display = "block";
+      return;
+    }
+
+    hint.style.display = "none";
+    showView("progress");
+
     const ids = Array.from($("#sectionSelect").selectedOptions).map(o => o.value);
-    parent.postMessage({ pluginMessage: { type: "run-plugin", selectedSectionIds: ids } }, "*");
+
+    setTimeout(() => {
+      parent.postMessage({ pluginMessage: { type: "run-plugin", selectedSectionIds: ids, conferencePrefix } }, "*");
+    }, 0);
   };
 
   $("#close").onclick = () => {

@@ -1,24 +1,28 @@
-// v1.0.0
+// v1.2.0
 
-figma.showUI(__html__, { width: 400, height: 300 });
+figma.showUI(__html__, { width: 400, height: 400 });
+figma.ui.postMessage({ type: "progress" });
 
-const allSections = figma.root.findAll(n => n.type === "SECTION");
+setTimeout(() => {
+  const allSections = figma.root.findAll(n => n.type === "SECTION");
 
-figma.ui.postMessage({
-  type: "init",
-  sections: allSections.map(s => ({ id: s.id, name: s.name }))
-});
+  figma.ui.postMessage({
+    type: "init",
+    sections: allSections.map(s => ({ id: s.id, name: s.name }))
+  });
+}, 500);
 
 figma.ui.onmessage = async (msg) => {
 
   if (msg.type === "run-plugin") {
 
-    // Section-Auswahl schließen
-    figma.ui.hide();
+    const conferencePrefix = msg.conferencePrefix || "";
 
-    // Fortschrittsfenster öffnen
-    figma.showUI(__html__, { width: 350, height: 140 });
+    // Fortschrittszustand direkt im vorhandenen UI anzeigen
     figma.ui.postMessage({ type: "progress" });
+
+    // Figma soll den Fortschrittszustand erst rendern, bevor die schwere Arbeit startet
+    await new Promise(resolve => setTimeout(resolve, 50));
 
     const selectedSectionIds = msg.selectedSectionIds;
 
@@ -34,9 +38,9 @@ figma.ui.onmessage = async (msg) => {
       );
 
     const errors = [];
-    await runPlugin(frames, errors);
+    await runPlugin(frames, errors, conferencePrefix);
 
-    // Fortschrittsfenster ersetzen → Fehlerfenster
+    // Ergebnisfenster im regulären Auswahl-Overlay anzeigen
     figma.showUI(__html__, { width: 800, height: 800 });
     figma.ui.postMessage({ type: "done", errors });
   }
@@ -96,6 +100,87 @@ function cleanFirstName(firstName) {
     .join("_");
 }
 
+function getTitleText(frame) {
+  const titleNode = frame.findOne(n => n.type === "TEXT" && n.name === "item__title");
+  return titleNode && titleNode.characters.trim() ? titleNode.characters.trim() : "";
+}
+
+function getItemTypeText(frame) {
+  const itemTypeNode = frame.findOne(n => n.type === "TEXT" && n.name === "item__type");
+  return itemTypeNode && itemTypeNode.characters.trim() ? itemTypeNode.characters.trim() : "";
+}
+
+function buildTitleToken(title) {
+  if (!title) return "";
+
+  return title
+    .trim()
+    .replace(/[-–—]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 3)
+    .map(word => replaceUmlauts(word).replace(/[^0-9A-Za-z]/g, ""))
+    .filter(Boolean)
+    .join("");
+}
+
+function insertTitleTokenIntoName(name, token) {
+  if (!token) return name;
+
+  const sectionTypes = ["Session", "Sessions", "Workshop", "Workshops", "Keynote", "Bootcamp", "Bootcamps"];
+  const pattern = new RegExp(`(^|[^A-Za-z0-9])(${sectionTypes.join("|")})(?:_[^_]+)?_1080x1080`, "i");
+
+  return name.replace(pattern, (match, prefix, type) => `${prefix}${type}_${token}_1080x1080`);
+}
+
+function sanitizeFrameNameSegment(value) {
+  if (!value) return "";
+
+  return replaceUmlauts(value.trim())
+    .replace(/[^A-Za-z0-9]+/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function buildFrameNamePrefix(namesCombined, conferencePrefix) {
+  const cleanPrefix = sanitizeFrameNameSegment(conferencePrefix);
+  return cleanPrefix ? `${namesCombined}_${cleanPrefix}` : namesCombined;
+}
+
+function appendFrameDimensionsToName(name, frame) {
+  if (!frame || !frame.width || !frame.height) return name;
+
+  const width = Math.round(frame.width);
+  const height = Math.round(frame.height);
+  const suffix = `${width}x${height}`;
+
+  return name.endsWith(`_${suffix}`) ? name : `${name}_${suffix}`;
+}
+
+function getChannelSegment(frame) {
+  if (!frame || !frame.width || !frame.height) return "";
+
+  const width = Math.round(frame.width);
+  const height = Math.round(frame.height);
+
+  if (width === 1080 && height === 1080) return "SoMe";
+  if (width === 500 && height === 400) return "NL";
+  return "";
+}
+
+function extractTicketNumberFromName(name) {
+  if (!name) return "";
+
+  const match = name.match(/\b(GT-\d{4,})\b/i);
+  return match ? match[1] : "";
+}
+
+function getParentTicketNumber(frame) {
+  const parent = frame.parent;
+  if (!parent || !parent.name) return "";
+  return extractTicketNumberFromName(parent.name);
+}
+
 function getSpeakerData(frame, errors) {
   const firstNameNode = frame.findOne(n =>
     (n.name === "item__firstName" || n.name === "speaker__firstName") && n.type === "TEXT"
@@ -130,7 +215,7 @@ function getSpeakerData(frame, errors) {
 // HAUPTFUNKTION
 // ==========================
 
-async function runPlugin(frames, errors) {
+async function runPlugin(frames, errors, conferencePrefix = "") {
   for (const frame of frames) {
 
     const speakerbild = frame.children.find(c => c.name === "Speakerbild");
@@ -141,14 +226,30 @@ async function runPlugin(frames, errors) {
 
     // Frame-Namen um Namen der Speaker erweitern
     const NamesCombined = speakers.map(s => `${cleanLastName(s.lastName)}_${cleanFirstName(s.firstName)}`).join("+");
-    // Zuerst Frame-Namen mit Vor- und Nachnamen präfixieren, wenn noch nicht geschehen
-    if (!frame.name.startsWith(`${NamesCombined}_`)) {
-      frame.name = `${NamesCombined}_${frame.name}`;
+    const speakerPrefix = NamesCombined;
+    const frameNamePrefix = buildFrameNamePrefix(NamesCombined, conferencePrefix);
+    const ticketNumber = getParentTicketNumber(frame);
+
+    const titleText = getTitleText(frame);
+    const itemTypeText = getItemTypeText(frame);
+    const titleToken = buildTitleToken(titleText);
+    const channelSegment = getChannelSegment(frame);
+
+    let frameNameBody = `${frameNamePrefix}`;
+    if (channelSegment) {
+      frameNameBody = `${frameNameBody}_${channelSegment}`;
     }
-    // Dann mit "/" separator präfixieren, wenn noch nicht geschehen
-    if (!frame.name.startsWith(`${NamesCombined} / `)) {
-      frame.name = `${NamesCombined} / ${frame.name}`;
+    if (itemTypeText) {
+      frameNameBody = `${frameNameBody}_${sanitizeFrameNameSegment(itemTypeText)}`;
     }
+    if (titleToken) {
+      frameNameBody = `${frameNameBody}_${titleToken}`;
+    }
+    frameNameBody = appendFrameDimensionsToName(frameNameBody, frame);
+
+    frame.name = ticketNumber
+      ? `${speakerPrefix} / ${frameNameBody}_${ticketNumber}`
+      : `${speakerPrefix} / ${frameNameBody}`;
 
     // Hilfstexte löschen (unterstütze item__* und speaker__* Varianten)
     frame
