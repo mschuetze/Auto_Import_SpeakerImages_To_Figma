@@ -1,10 +1,10 @@
-// v1.2.0
+// v1.2.1
 
 figma.showUI(__html__, { width: 400, height: 400 });
 figma.ui.postMessage({ type: "progress" });
 
 setTimeout(() => {
-  const allSections = figma.root.findAll(n => n.type === "SECTION");
+  const allSections = figma.currentPage.children.filter(n => n.type === "SECTION");
 
   figma.ui.postMessage({
     type: "init",
