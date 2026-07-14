@@ -90,6 +90,7 @@
       showView("select");
 
       const sel = $("#sectionSelect");
+      const prefixInput = $("#conferencePrefix");
       sel.innerHTML = "";
       msg.sections.forEach(sec => {
         const opt = document.createElement("option");
@@ -97,6 +98,10 @@
         opt.textContent = sec.name;
         sel.appendChild(opt);
       });
+
+      if (msg.conferencePrefix !== undefined) {
+        prefixInput.value = msg.conferencePrefix;
+      }
     }
 
     if (msg.type === "progress") {

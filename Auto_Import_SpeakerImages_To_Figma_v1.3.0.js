@@ -1,4 +1,4 @@
-// v1.2.2
+// v1.3.0
 
 figma.showUI(__html__, { width: 400, height: 400 });
 figma.ui.postMessage({ type: "progress" });
@@ -19,12 +19,22 @@ function getNestedSections(node) {
   return sections;
 }
 
+function getConferencePrefixFromPage() {
+  const targetSection = figma.currentPage.children.find(child => child.type === "SECTION" && child.name === "Konferenzpräfix");
+  if (!targetSection) return "";
+
+  const textNode = targetSection.findOne(node => node.type === "TEXT");
+  return textNode && textNode.characters ? textNode.characters.trim() : "";
+}
+
 setTimeout(() => {
   const allSections = getNestedSections(figma.currentPage);
+  const conferencePrefix = getConferencePrefixFromPage();
 
   figma.ui.postMessage({
     type: "init",
-    sections: allSections.map(s => ({ id: s.id, name: s.name }))
+    sections: allSections.map(s => ({ id: s.id, name: s.name })),
+    conferencePrefix
   });
 }, 500);
 
