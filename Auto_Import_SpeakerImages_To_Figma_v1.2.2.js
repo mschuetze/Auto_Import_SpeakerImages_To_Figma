@@ -1,10 +1,26 @@
-// v1.2.1
+// v1.2.2
 
 figma.showUI(__html__, { width: 400, height: 400 });
 figma.ui.postMessage({ type: "progress" });
 
+function getNestedSections(node) {
+  const sections = [];
+
+  function visit(currentNode) {
+    currentNode.children.forEach(child => {
+      if (child.type === "SECTION") {
+        sections.push(child);
+        visit(child);
+      }
+    });
+  }
+
+  visit(node);
+  return sections;
+}
+
 setTimeout(() => {
-  const allSections = figma.currentPage.children.filter(n => n.type === "SECTION");
+  const allSections = getNestedSections(figma.currentPage);
 
   figma.ui.postMessage({
     type: "init",
@@ -26,16 +42,24 @@ figma.ui.onmessage = async (msg) => {
 
     const selectedSectionIds = msg.selectedSectionIds;
 
-    const frames = selectedSectionIds
+    const selectedSections = selectedSectionIds
       .map(id => figma.getNodeById(id))
-      .filter(n => n && n.type === "SECTION")
-      .flatMap(section =>
-        section.children.filter(
-          child =>
-            child.type === "FRAME" &&
-            child.children.some(c => c.name === "Speakerbild")
-        )
-      );
+      .filter(n => n && n.type === "SECTION");
+
+    const frames = Array.from(
+      new Map(
+        selectedSections
+          .flatMap(section => [section, ...getNestedSections(section)])
+          .flatMap(section =>
+            section.children.filter(
+              child =>
+                child.type === "FRAME" &&
+                child.children.some(c => c.name === "Speakerbild")
+            )
+          )
+          .map(frame => [frame.id, frame])
+      ).values()
+    );
 
     const errors = [];
     await runPlugin(frames, errors, conferencePrefix);
@@ -107,7 +131,12 @@ function getTitleText(frame) {
 
 function getItemTypeText(frame) {
   const itemTypeNode = frame.findOne(n => n.type === "TEXT" && n.name === "item__type");
-  return itemTypeNode && itemTypeNode.characters.trim() ? itemTypeNode.characters.trim() : "";
+  if (itemTypeNode && itemTypeNode.characters.trim()) {
+    return itemTypeNode.characters.trim();
+  }
+
+  const speakerNameNode = frame.findOne(n => n.type === "TEXT" && n.name === "speaker__name");
+  return speakerNameNode && speakerNameNode.characters.trim() ? "Speaker" : "";
 }
 
 function buildTitleToken(title) {
