@@ -1,4 +1,4 @@
-// v1.3.0
+// v1.3.1
 
 figma.showUI(__html__, { width: 400, height: 400 });
 figma.ui.postMessage({ type: "progress" });
@@ -140,12 +140,22 @@ function getTitleText(frame) {
 }
 
 function getItemTypeText(frame) {
-  const itemTypeNode = frame.findOne(n => n.type === "TEXT" && n.name === "item__type");
-  if (itemTypeNode && itemTypeNode.characters.trim()) {
-    return itemTypeNode.characters.trim();
+  const itemTypeNames = ["item__type", "Session", "Workshop", "Keynote", "Bootcamp"];
+  const itemTypeNodeByName = frame.findOne(
+    n => n.type === "TEXT" && itemTypeNames.some(name => {
+      const nameMatches = name.toLowerCase() === n.name.toLowerCase();
+      return nameMatches && n.characters.trim();
+    })
+  );
+  if (itemTypeNodeByName) {
+    return itemTypeNodeByName.characters.trim();
   }
 
-  const speakerNameNode = frame.findOne(n => n.type === "TEXT" && n.name === "speaker__name");
+  const speakerNameNode = frame.findOne(
+    n => n.type === "TEXT" &&
+      ["speaker__name", "item__name"].includes(n.name.toLowerCase()) &&
+      n.characters.trim()
+  );
   return speakerNameNode && speakerNameNode.characters.trim() ? "Speaker" : "";
 }
 
