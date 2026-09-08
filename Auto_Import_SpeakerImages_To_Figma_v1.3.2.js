@@ -148,7 +148,8 @@ function getItemTypeText(frame) {
     })
   );
   if (itemTypeNodeByName) {
-    return itemTypeNodeByName.characters.trim();
+    const itemTypeText = itemTypeNodeByName.characters.trim();
+    return itemTypeText.charAt(0).toUpperCase() + itemTypeText.slice(1).toLowerCase();
   }
 
   const speakerNameNode = frame.findOne(
