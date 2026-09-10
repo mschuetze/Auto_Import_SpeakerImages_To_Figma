@@ -1,4 +1,4 @@
-// v1.3.2
+// v1.3.3
 
 figma.showUI(__html__, { width: 400, height: 400 });
 figma.ui.postMessage({ type: "progress" });
@@ -133,7 +133,29 @@ function cleanFirstName(firstName) {
     .split(/\s+/)
     .join("_");
 }
+function getNameVariantsForFilePath(name) {
+  const raw = (name || "").trim();
+  if (!raw) return [];
 
+  const normalized = replaceUmlauts(raw)
+    .replace(/['’`´\u0300-\u036F]/g, "_")
+    .replace(/\s+/g, "_")
+    .replace(/-+/g, "_")
+    .replace(/_+/g, "_")
+    .toLowerCase()
+    .replace(/^_+|_+$/g, "");
+
+  if (!normalized) return [];
+
+  const parts = normalized.split("_").filter(Boolean);
+  if (parts.length <= 1) {
+    return [normalized];
+  }
+
+  const underscore = parts.join("_");
+  const hyphen = parts.join("-");
+  return [...new Set([underscore, hyphen])];
+}
 function getTitleText(frame) {
   const titleNode = frame.findOne(n => n.type === "TEXT" && n.name === "item__title");
   return titleNode && titleNode.characters.trim() ? titleNode.characters.trim() : "";
@@ -322,10 +344,11 @@ async function runPlugin(frames, errors, conferencePrefix = "") {
     // Bilder laden
     for (let i = 0; i < speakers.length; i++) {
       const { firstName, lastName } = speakers[i];
-      const fn = cleanFirstName(firstName);
-      const ln = cleanLastName(lastName);
+      const firstNameVariants = getNameVariantsForFilePath(firstName);
+      const lastNameVariants = getNameVariantsForFilePath(lastName);
 
-      const firstLetter = (ln && ln.length > 0) ? ln[0] : "";
+      const lookupName = (lastNameVariants[0] || cleanLastName(lastName));
+      const firstLetter = (lookupName && lookupName.length > 0) ? lookupName[0] : "";
       const folder =
         ("abc".includes(firstLetter) && "abc/") ||
         ("def".includes(firstLetter) && "def/") ||
@@ -338,12 +361,23 @@ async function runPlugin(frames, errors, conferencePrefix = "") {
         ("xyz".includes(firstLetter) && "xyz/") ||
         "";
 
-      const filenames = [
-        `${ln}_${fn}_frei.png`,
-        `${ln}_${fn}_dr_frei.png`,
-        `${ln}_${fn}_wp_1024x1024.jpg`,
-        `${ln}_${fn}_dr_wp_1024x1024.jpg`
-      ];
+      const filenameCandidates = [];
+      for (const fn of firstNameVariants.length ? firstNameVariants : [cleanFirstName(firstName)]) {
+        for (const ln of lastNameVariants.length ? lastNameVariants : [cleanLastName(lastName)]) {
+          filenameCandidates.push(
+            `${ln}_${fn}_frei.png`,
+            `${ln}-${fn}_frei.png`,
+            `${ln}_${fn}_dr_frei.png`,
+            `${ln}-${fn}_dr_frei.png`,
+            `${ln}_${fn}_wp_1024x1024.jpg`,
+            `${ln}-${fn}_wp_1024x1024.jpg`,
+            `${ln}_${fn}_dr_wp_1024x1024.jpg`,
+            `${ln}-${fn}_dr_wp_1024x1024.jpg`
+          );
+        }
+      }
+
+      const filenames = [...new Set(filenameCandidates)];
 
       let success = false;
       const tried = [];
