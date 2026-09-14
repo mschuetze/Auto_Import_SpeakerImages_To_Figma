@@ -1,4 +1,4 @@
-// v1.3.3
+// v1.3.4
 
 figma.showUI(__html__, { width: 400, height: 400 });
 figma.ui.postMessage({ type: "progress" });
@@ -99,13 +99,15 @@ function replaceUmlauts(str) {
     .replace(/é|è|ê|ë|ē/g, "e").replace(/É|È|Ê|Ë|Ē/g, "E")
     .replace(/í|ì|î|ï|ī/g, "i").replace(/Í|Ì|Î|Ï|Ī/g, "I")
     .replace(/ó|ò|ô|õ|ø|ō/g, "o").replace(/Ó|Ò|Ô|Õ|Ø|Ō/g, "O")
-    .replace(/ú|ù|û|ū/g, "u").replace(/Ú|Ù|Û|Ū/g, "U")
+    .replace(/ú|ù|û|ū|ů/g, "u").replace(/Ú|Ù|Û|Ū|Ů/g, "U")
     .replace(/ñ/g, "n").replace(/Ñ/g, "N")
     .replace(/ç/g, "c").replace(/Ç/g, "C")
     .replace(/ł/g, "l").replace(/Ł/g, "L")
     .replace(/đ/g, "d").replace(/Đ/g, "D")
     .replace(/š/g, "s").replace(/Š/g, "S")
-    .replace(/ž/g, "z").replace(/Ž/g, "Z");
+    .replace(/ž/g, "z").replace(/Ž/g, "Z")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 function removeTitles(name) {
