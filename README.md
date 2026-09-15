@@ -30,7 +30,7 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 4. **Talk-Typ**
     - hierzu wird jeder FRAME nach Textfeldern mit diesen Namen durchsucht und dann dessen Inhalt als TYPE genutzt:
       - "Session", "Sessions", "Workshop", "Workshops", "Keynote", "Bootcamp", "Bootcamps" 
-5. extrahiert die ersten 3 Wörter des Talk-Titels, um eine eindeutige Zuordnung zu ermöglichen
+5. liest die `uniqueID` aus dem gleichnamigen Textfeld im Frame aus
 6. Breite + Höhe wird dynamisch abgefragt 
 7. Ticket-Nummer aus dem übergeordneten Frame/Namen
 

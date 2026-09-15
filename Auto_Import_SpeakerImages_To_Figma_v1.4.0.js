@@ -1,4 +1,4 @@
-// v1.3.4
+// v1.4.0
 
 figma.showUI(__html__, { width: 400, height: 400 });
 figma.ui.postMessage({ type: "progress" });
@@ -158,9 +158,12 @@ function getNameVariantsForFilePath(name) {
   const hyphen = parts.join("-");
   return [...new Set([underscore, hyphen])];
 }
-function getTitleText(frame) {
-  const titleNode = frame.findOne(n => n.type === "TEXT" && n.name === "item__title");
-  return titleNode && titleNode.characters.trim() ? titleNode.characters.trim() : "";
+function getUniqueIdText(frame) {
+  const uniqueIdNode = frame.findOne(n => n.type === "TEXT" && n.name === "item__uniqueId");
+  if (!uniqueIdNode || !uniqueIdNode.characters.trim()) return "";
+
+  const uniqueId = uniqueIdNode.characters.trim();
+  return `id${uniqueId.slice(uniqueId.lastIndexOf("_") + 1)}`;
 }
 
 function getItemTypeText(frame) {
@@ -182,29 +185,6 @@ function getItemTypeText(frame) {
       n.characters.trim()
   );
   return speakerNameNode && speakerNameNode.characters.trim() ? "Speaker" : "";
-}
-
-function buildTitleToken(title) {
-  if (!title) return "";
-
-  return title
-    .trim()
-    .replace(/[-–—]/g, " ")
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 3)
-    .map(word => replaceUmlauts(word).replace(/[^0-9A-Za-z]/g, ""))
-    .filter(Boolean)
-    .join("");
-}
-
-function insertTitleTokenIntoName(name, token) {
-  if (!token) return name;
-
-  const sectionTypes = ["Session", "Sessions", "Workshop", "Workshops", "Keynote", "Bootcamp", "Bootcamps"];
-  const pattern = new RegExp(`(^|[^A-Za-z0-9])(${sectionTypes.join("|")})(?:_[^_]+)?_1080x1080`, "i");
-
-  return name.replace(pattern, (match, prefix, type) => `${prefix}${type}_${token}_1080x1080`);
 }
 
 function sanitizeFrameNameSegment(value) {
@@ -304,9 +284,8 @@ async function runPlugin(frames, errors, conferencePrefix = "") {
     const frameNamePrefix = buildFrameNamePrefix(NamesCombined, conferencePrefix);
     const ticketNumber = getParentTicketNumber(frame);
 
-    const titleText = getTitleText(frame);
     const itemTypeText = getItemTypeText(frame);
-    const titleToken = buildTitleToken(titleText);
+    const uniqueId = sanitizeFrameNameSegment(getUniqueIdText(frame));
     const channelSegment = getChannelSegment(frame);
 
     let frameNameBody = `${frameNamePrefix}`;
@@ -316,8 +295,8 @@ async function runPlugin(frames, errors, conferencePrefix = "") {
     if (itemTypeText) {
       frameNameBody = `${frameNameBody}_${sanitizeFrameNameSegment(itemTypeText)}`;
     }
-    if (titleToken) {
-      frameNameBody = `${frameNameBody}_${titleToken}`;
+    if (uniqueId) {
+      frameNameBody = `${frameNameBody}_${uniqueId}`;
     }
     frameNameBody = appendFrameDimensionsToName(frameNameBody, frame);
 
@@ -331,6 +310,9 @@ async function runPlugin(frames, errors, conferencePrefix = "") {
       .forEach(n => n.remove());
     frame
       .findAll(n => n.name === "item__lastName" || n.name === "speaker__lastName")
+      .forEach(n => n.remove());
+    frame
+      .findAll(n => n.name === "item__uniqueId")
       .forEach(n => n.remove());
 
     // Für mehrere Speaker klonen
