@@ -1,4 +1,4 @@
-// v1.4.0
+// v1.4.1
 
 figma.showUI(__html__, { width: 400, height: 400 });
 figma.ui.postMessage({ type: "progress" });
@@ -158,8 +158,22 @@ function getNameVariantsForFilePath(name) {
   const hyphen = parts.join("-");
   return [...new Set([underscore, hyphen])];
 }
+function matchesTextFieldName(node, fieldNames) {
+  if (!node || node.type !== "TEXT") return false;
+
+  const normalizedName = node.name.toLowerCase();
+  return fieldNames.some(fieldName => {
+    const normalizedFieldName = fieldName.toLowerCase();
+    return (
+      normalizedName === normalizedFieldName ||
+      normalizedName === `item__${normalizedFieldName}` ||
+      normalizedName === `speaker__${normalizedFieldName}`
+    );
+  }) && !!node.characters.trim();
+}
+
 function getUniqueIdText(frame) {
-  const uniqueIdNode = frame.findOne(n => n.type === "TEXT" && n.name === "item__uniqueId");
+  const uniqueIdNode = frame.findOne(n => matchesTextFieldName(n, ["uniqueId", "item__uniqueId", "speaker__uniqueId"]));
   if (!uniqueIdNode || !uniqueIdNode.characters.trim()) return "";
 
   const uniqueId = uniqueIdNode.characters.trim();
@@ -167,12 +181,9 @@ function getUniqueIdText(frame) {
 }
 
 function getItemTypeText(frame) {
-  const itemTypeNames = ["item__type", "Session", "Workshop", "Keynote", "Bootcamp"];
+  const itemTypeNames = ["type", "item__type", "Session", "Workshop", "Keynote", "Bootcamp"];
   const itemTypeNodeByName = frame.findOne(
-    n => n.type === "TEXT" && itemTypeNames.some(name => {
-      const nameMatches = name.toLowerCase() === n.name.toLowerCase();
-      return nameMatches && n.characters.trim();
-    })
+    n => matchesTextFieldName(n, itemTypeNames)
   );
   if (itemTypeNodeByName) {
     const itemTypeText = itemTypeNodeByName.characters.trim();
@@ -180,9 +191,7 @@ function getItemTypeText(frame) {
   }
 
   const speakerNameNode = frame.findOne(
-    n => n.type === "TEXT" &&
-      ["speaker__name", "item__name"].includes(n.name.toLowerCase()) &&
-      n.characters.trim()
+    n => matchesTextFieldName(n, ["speaker__name", "item__name", "name"])
   );
   return speakerNameNode && speakerNameNode.characters.trim() ? "Speaker" : "";
 }
@@ -237,16 +246,16 @@ function getParentTicketNumber(frame) {
 
 function getSpeakerData(frame, errors) {
   const firstNameNode = frame.findOne(n =>
-    (n.name === "item__firstName" || n.name === "speaker__firstName") && n.type === "TEXT"
+    matchesTextFieldName(n, ["firstName", "item__firstName", "speaker__firstName"])
   );
 
   const lastNameNode = frame.findOne(n =>
-    (n.name === "item__lastName" || n.name === "speaker__lastName") && n.type === "TEXT"
+    matchesTextFieldName(n, ["lastName", "item__lastName", "speaker__lastName"])
   );
 
   if (!firstNameNode || !lastNameNode) {
     errors.push(
-      `❌ "item__firstName/speaker__firstName" oder "item__lastName/speaker__lastName" fehlt im Frame "${frame.name}"`
+      `❌ "firstName/item__firstName/speaker__firstName" oder "lastName/item__lastName/speaker__lastName" fehlt im Frame "${frame.name}"`
     );
     return null;
   }
@@ -304,15 +313,15 @@ async function runPlugin(frames, errors, conferencePrefix = "") {
       ? `${speakerPrefix} / ${frameNameBody}_${ticketNumber}`
       : `${speakerPrefix} / ${frameNameBody}`;
 
-    // Hilfstexte löschen (unterstütze item__* und speaker__* Varianten)
+    // Hilfstexte löschen (unterstütze item__*, speaker__* und ohne Präfix)
     frame
-      .findAll(n => n.name === "item__firstName" || n.name === "speaker__firstName")
+      .findAll(n => matchesTextFieldName(n, ["firstName", "item__firstName", "speaker__firstName"]))
       .forEach(n => n.remove());
     frame
-      .findAll(n => n.name === "item__lastName" || n.name === "speaker__lastName")
+      .findAll(n => matchesTextFieldName(n, ["lastName", "item__lastName", "speaker__lastName"]))
       .forEach(n => n.remove());
     frame
-      .findAll(n => n.name === "item__uniqueId")
+      .findAll(n => matchesTextFieldName(n, ["uniqueId", "item__uniqueId", "speaker__uniqueId"]))
       .forEach(n => n.remove());
 
     // Für mehrere Speaker klonen
