@@ -22,6 +22,7 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 - lädt das entsprechende Speakerbild und platziert es automatisch in dem Bildrahmen
   - falls mehrere Speaker im Frame vorhanden sind, werden zusätzliche Bild-Instanzen geklont und entsprechend mit Bildern belegt
 - meldet fehlende Textfelder oder nicht gefundene Bilddateien per Fehlerliste im Plugin-Overlay
+![alt text](https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/blob/main/Bilder/figma5.png)
 ### Konstruktion von Framebezeichnung
 1. **Speakername** aus vorigem Schritt
     - dabei wird mittels ` / ` getrennt der Name doppelt eingesetzt, um beim Export aus Figma direkt Speaker-spezifische Unterordner zu erzeugen 
