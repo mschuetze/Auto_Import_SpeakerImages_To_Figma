@@ -22,18 +22,18 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 - lädt das entsprechende Speakerbild und platziert es automatisch in dem Bildrahmen
   - falls mehrere Speaker im Frame vorhanden sind, werden zusätzliche Bild-Instanzen geklont und entsprechend mit Bildern belegt
 - meldet fehlende Textfelder oder nicht gefundene Bilddateien per Fehlerliste im Plugin-Overlay
-![alt text](https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/blob/main/Bilder/figma5.png)
 ### Konstruktion von Framebezeichnung
 1. **Speakername** aus vorigem Schritt
-    - dabei wird mittels ` / ` getrennt der Name doppelt eingesetzt, um beim Export aus Figma direkt Speaker-spezifische Unterordner zu erzeugen 
-2. **Konferenz-Präfix** – wahlweise automatisch aus eigens dafür angelegter SECTION oder manuell im Dialog eingegeben
-3. der String `SoMe`
-4. **Talk-Typ**
+2. dabei wird mittels `/` getrennt der Name doppelt eingesetzt, um beim Export aus Figma direkt Speaker-spezifische Unterordner zu erzeugen 
+3. **Konferenz-Präfix** – wahlweise automatisch aus eigens dafür angelegter SECTION oder manuell im Dialog eingegeben
+4. der String `SoMe`
+5. **Talk-Typ**
     - hierzu wird jeder FRAME nach Textfeldern mit diesen Namen durchsucht und dann dessen Inhalt als TYPE genutzt:
       - "Session", "Sessions", "Workshop", "Workshops", "Keynote", "Bootcamp", "Bootcamps" 
-5. liest die `uniqueID` aus dem gleichnamigen Textfeld im Frame aus
-6. Breite + Höhe wird dynamisch abgefragt 
-7. Ticket-Nummer aus dem übergeordneten Frame/Namen
+6. liest die `uniqueID` aus dem gleichnamigen Textfeld im Frame aus
+7. Breite + Höhe wird dynamisch abgefragt 
+8. Ticket-Nummer aus dem übergeordneten Frame/Namen
+![alt text](https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/blob/main/Bilder/figma5.png)
 
 
 
