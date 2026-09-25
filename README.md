@@ -15,7 +15,8 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 ### Konstruktion von Speakernamen + Bildpfad
 - durchsucht die ausgewählten SECTION inklusive aller verschachtelten Sections nach den Textfeldern: 
   - **item__firstName** / **item__lastName** oder 
-  - **speaker__firstName** / **speaker__lastName**  
+  - **speaker__firstName** / **speaker__lastName** oder
+  - **firstName** / **lastName**
 - generiert daraus den/die Vor- und Nachnamen (Support für mehrere, durch Komma getrennet Speaker)
 - bereinigt Sonderzeichen und Leerzeichen
 - durchsucht alle FRAMES nach einem Bildrahmen mit dem Namen **Speakerbild**
