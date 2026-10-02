@@ -1,4 +1,4 @@
-// v1.4.1
+// v1.4.2
 
 figma.showUI(__html__, { width: 400, height: 400 });
 figma.ui.postMessage({ type: "progress" });
@@ -116,7 +116,7 @@ function removeTitles(name) {
 
   return name
     .replace(titlePattern, "")
-    .replace(/[.\-]+/g, "")
+    .replace(/[.]+/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -131,11 +131,12 @@ function cleanLastName(lastName) {
 function cleanFirstName(firstName) {
   const cleaned = removeTitles(firstName);
   return replaceUmlauts(cleaned.trim())
+    .replace(/-/g, "")
     .toLowerCase()
     .split(/\s+/)
     .join("_");
 }
-function getNameVariantsForFilePath(name) {
+function getNameVariantsForFilePath(name, includeCompact = false) {
   const raw = (name || "").trim();
   if (!raw) return [];
 
@@ -156,7 +157,9 @@ function getNameVariantsForFilePath(name) {
 
   const underscore = parts.join("_");
   const hyphen = parts.join("-");
-  return [...new Set([underscore, hyphen])];
+  const variants = [underscore, hyphen];
+  if (includeCompact) variants.push(parts.join(""));
+  return [...new Set(variants)];
 }
 function matchesTextFieldName(node, fieldNames) {
   if (!node || node.type !== "TEXT") return false;
@@ -337,7 +340,7 @@ async function runPlugin(frames, errors, conferencePrefix = "") {
     // Bilder laden
     for (let i = 0; i < speakers.length; i++) {
       const { firstName, lastName } = speakers[i];
-      const firstNameVariants = getNameVariantsForFilePath(firstName);
+      const firstNameVariants = getNameVariantsForFilePath(firstName, true);
       const lastNameVariants = getNameVariantsForFilePath(lastName);
 
       const lookupName = (lastNameVariants[0] || cleanLastName(lastName));
