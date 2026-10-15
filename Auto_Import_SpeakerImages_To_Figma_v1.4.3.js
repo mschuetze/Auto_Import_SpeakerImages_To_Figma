@@ -1,4 +1,4 @@
-// v1.4.2
+// v1.4.3
 
 figma.showUI(__html__, { width: 400, height: 400 });
 figma.ui.postMessage({ type: "progress" });
