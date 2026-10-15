@@ -72,7 +72,12 @@ figma.ui.onmessage = async (msg) => {
     );
 
     const errors = [];
-    await runPlugin(frames, errors, conferencePrefix);
+    await runPlugin(
+      frames,
+      errors,
+      conferencePrefix,
+      (current, total) => figma.ui.postMessage({ type: "progress-update", current, total })
+    );
 
     // Ergebnisfenster im regulären Auswahl-Overlay anzeigen
     figma.showUI(__html__, { width: 800, height: 800 });
@@ -281,8 +286,11 @@ function getSpeakerData(frame, errors) {
 // HAUPTFUNKTION
 // ==========================
 
-async function runPlugin(frames, errors, conferencePrefix = "") {
-  for (const frame of frames) {
+async function runPlugin(frames, errors, conferencePrefix = "", onProgress = () => {}) {
+  for (let frameIndex = 0; frameIndex < frames.length; frameIndex++) {
+    onProgress(frameIndex + 1, frames.length);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const frame = frames[frameIndex];
 
     const speakerbild = frame.children.find(c => c.name === "Speakerbild");
     if (!speakerbild) continue;

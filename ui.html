@@ -49,7 +49,8 @@
   <!-- Fortschritt -->
   <div id="progress" style="display:block;">
     <h2>Bitte warten…</h2>
-    <p>Das Skript arbeitet.</p>
+    <p id="progressMessage">Das Skript arbeitet.</p>
+    <p id="progressCount" aria-live="polite"></p>
   </div>
 
   <!-- Section-Auswahl -->
@@ -106,6 +107,13 @@
 
     if (msg.type === "progress") {
       showView("progress");
+      $("#progressMessage").textContent = "Das Skript arbeitet.";
+      $("#progressCount").textContent = "";
+    }
+
+    if (msg.type === "progress-update") {
+      showView("progress");
+      $("#progressCount").textContent = `${msg.current}/${msg.total}`;
     }
 
     if (msg.type === "done") {
@@ -129,14 +137,14 @@
 
   $("#run").onclick = () => {
     const conferencePrefix = $("#conferencePrefix").value.trim();
-    const hint = $("#conferencePrefixHint");
 
     if (!conferencePrefix) {
-      hint.style.display = "block";
+      $("#conferencePrefixHint").style.display = "block";
       return;
     }
 
-    hint.style.display = "none";
+    $("#conferencePrefixHint").style.display = "none";
+
     showView("progress");
 
     const ids = Array.from($("#sectionSelect").selectedOptions).map(o => o.value);

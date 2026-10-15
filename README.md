@@ -22,6 +22,7 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 - durchsucht alle FRAMES nach einem Bildrahmen mit dem Namen **Speakerbild**
 - lädt das entsprechende Speakerbild und platziert es automatisch in dem Bildrahmen
   - falls mehrere Speaker im Frame vorhanden sind, werden zusätzliche Bild-Instanzen geklont und entsprechend mit Bildern belegt
+- zeigt während der Bearbeitung den Fortschritt als aktuelle Grafik/Gesamtzahl an (z. B. **7/21**)
 - meldet fehlende Textfelder oder nicht gefundene Bilddateien per Fehlerliste im Plugin-Overlay
 ### Konstruktion von Framebezeichnung
 1. **Speakername** aus vorigem Schritt
