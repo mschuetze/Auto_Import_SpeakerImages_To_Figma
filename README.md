@@ -67,7 +67,8 @@ Figma-Plugins dürfen aus Sicherheitsgründen keine lokalen Dateien laden. Wir u
 3. **.htaccess einfügen**
   - via App **Finder** hier hin navigieren: `Programme/MAMP/htdocs/`
   - unsichtbare/versteckte Dateien sichtbar machen mittels Tastenkombination `Befehl (⌘) + Umschalttaste (⇧) + Punkt (.)`
-  - Füge Datei **.htaccess** aus dem GitHub-Download ein
+  - Füge die aktuelle Datei **.htaccess** aus dem GitHub-Download ein bzw. ersetze die vorhandene Datei
+  - Die Rewrite-Regeln sind optional. So funktioniert der Bilder-Endpunkt auch, wenn ein MAMP-Update `mod_rewrite` deaktiviert.
 
 4. **httpd.conf ersetzen**
   - via App **Finder** hier hin navigieren: `/Programme/MAMP/conf/apache/`
@@ -101,6 +102,11 @@ Zunächst müssen alle [Voraussetzungen](#voraussetzungen) erfüllt sein.
 ![alt text](https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/blob/main/Bilder/figma2.png)
 - Plugin **Auto_Import_SpeakerImages_To_Figma** anklicken
 ![alt text](https://github.com/mschuetze/Auto_Import_SpeakerImages_To_Figma/blob/main/Bilder/figma3.png)
+
+### Fehlerbehebung nach einem MAMP-Update
+- Im Browser `http://localhost:8888/bilder/` öffnen. Eine Antwort **500 Internal Server Error** deutet auf einen Apache-Fehler hin.
+- Wenn das Apache-Fehlerprotokoll `Invalid command 'RewriteEngine'` meldet, ist die vorhandene `.htaccess` veraltet oder `mod_rewrite` deaktiviert. Die aktuelle `.htaccess` aus dem Download nach `/Applications/MAMP/htdocs/` kopieren. Ein Neustart von MAMP ist dafür nicht nötig.
+- Das Plugin zeigt bei fehlgeschlagenen Bildanfragen nun zusätzlich den HTTP-Status bzw. Netzwerkfehler an.
 
 ## Plugin aktualisieren
 Wenn eine neuere Version des Plugins verfügbar ist, müssen folgende Schritte erledigt werden, um es korrekt einzubinden:

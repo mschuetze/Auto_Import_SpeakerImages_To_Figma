@@ -1,4 +1,4 @@
-// v1.4.3
+// v1.4.4
 
 figma.showUI(__html__, { width: 400, height: 400 });
 figma.ui.postMessage({ type: "progress" });
@@ -385,6 +385,7 @@ async function runPlugin(frames, errors, conferencePrefix = "", onProgress = () 
 
       let success = false;
       const tried = [];
+      const failureReasons = new Set();
 
       for (const f of filenames) {
         const url = baseURL + folder + f;
@@ -392,19 +393,25 @@ async function runPlugin(frames, errors, conferencePrefix = "", onProgress = () 
 
         try {
           const res = await fetch(url);
-          if (!res.ok) continue;
+          if (!res.ok) {
+            failureReasons.add(`HTTP ${res.status}`);
+            continue;
+          }
 
           const buffer = await res.arrayBuffer();
           const image = figma.createImage(new Uint8Array(buffer));
           nodes[i].fills = [{ type: "IMAGE", scaleMode: "FILL", imageHash: image.hash }];
           success = true;
           break;
-        } catch (_) {}
+        } catch (error) {
+          failureReasons.add(error instanceof Error ? error.message : String(error));
+        }
       }
 
       if (!success) {
         errors.push(
           `⚠️ Kein Bild für "${firstName} ${lastName}" in Frame "${frame.name}"\n` +
+          (failureReasons.size ? `Fehler: ${[...failureReasons].join(", ")}\n` : "") +
           tried.map(t => "  • " + t).join("\n")
         );
       }
