@@ -234,8 +234,8 @@ function getChannelSegment(frame) {
   const width = Math.round(frame.width);
   const height = Math.round(frame.height);
 
-  if (width === 1080 && height === 1080) return "SoMe";
-  if (width === 500 && height === 400) return "NL";
+  if (width === 1080 && height === 1080) return "SoMe_code";
+  if (width === 500 && height === 400) return "NL_code";
   return "";
 }
 

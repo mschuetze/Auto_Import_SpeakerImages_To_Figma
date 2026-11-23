@@ -28,7 +28,7 @@ Skript bzw. Plugin für Figma, um den Programmgrafiken NACH der Datenzusammenfü
 1. **Speakername** aus vorigem Schritt
 2. dabei wird mittels `/` getrennt der Name doppelt eingesetzt, um beim Export aus Figma direkt Speaker-spezifische Unterordner zu erzeugen 
 3. **Konferenz-Präfix** – wahlweise automatisch aus eigens dafür angelegter SECTION oder manuell im Dialog eingegeben
-4. der String `SoMe`
+4. der String `SoMe_code` bzw. `NL_code`
 5. **Talk-Typ**
     - hierzu wird jeder FRAME nach Textfeldern mit diesen Namen durchsucht und dann dessen Inhalt als TYPE genutzt:
       - "Session", "Sessions", "Workshop", "Workshops", "Keynote", "Bootcamp", "Bootcamps" 
