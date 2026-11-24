@@ -42,6 +42,11 @@
       color: #b00;
       font-size: 13px;
     }
+    .version {
+      margin-top: 16px;
+      color: #888;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
@@ -64,6 +69,7 @@
       <div id="conferencePrefixHint" class="hint" style="display:none;">Bitte einen Konferenzpräfix eingeben.</div>
     </div>
     <button id="run">Plugin starten</button>
+    <p id="version" class="version"></p>
   </div>
 
   <!-- Fehlerprotokoll -->
@@ -86,6 +92,10 @@
 
   onmessage = (ev) => {
     const msg = ev.data.pluginMessage;
+
+    if (typeof msg.version === "string") {
+      $("#version").textContent = `Version ${msg.version}`;
+    }
 
     if (msg.type === "init") {
       showView("select");

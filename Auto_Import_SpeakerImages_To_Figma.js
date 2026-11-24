@@ -1,7 +1,11 @@
-// v1.4.4
+const PLUGIN_VERSION = "1.5.0";
+
+function postUIMessage(message) {
+  figma.ui.postMessage({ ...message, version: PLUGIN_VERSION });
+}
 
 figma.showUI(__html__, { width: 400, height: 400 });
-figma.ui.postMessage({ type: "progress" });
+postUIMessage({ type: "progress" });
 
 function getNestedSections(node) {
   const sections = [];
@@ -31,7 +35,7 @@ setTimeout(() => {
   const allSections = getNestedSections(figma.currentPage);
   const conferencePrefix = getConferencePrefixFromPage();
 
-  figma.ui.postMessage({
+  postUIMessage({
     type: "init",
     sections: allSections.map(s => ({ id: s.id, name: s.name })),
     conferencePrefix
@@ -45,7 +49,7 @@ figma.ui.onmessage = async (msg) => {
     const conferencePrefix = msg.conferencePrefix || "";
 
     // Fortschrittszustand direkt im vorhandenen UI anzeigen
-    figma.ui.postMessage({ type: "progress" });
+    postUIMessage({ type: "progress" });
 
     // Figma soll den Fortschrittszustand erst rendern, bevor die schwere Arbeit startet
     await new Promise(resolve => setTimeout(resolve, 50));
@@ -76,12 +80,12 @@ figma.ui.onmessage = async (msg) => {
       frames,
       errors,
       conferencePrefix,
-      (current, total) => figma.ui.postMessage({ type: "progress-update", current, total })
+      (current, total) => postUIMessage({ type: "progress-update", current, total })
     );
 
     // Ergebnisfenster im regulären Auswahl-Overlay anzeigen
     figma.showUI(__html__, { width: 800, height: 800 });
-    figma.ui.postMessage({ type: "done", errors });
+    postUIMessage({ type: "done", errors });
   }
 
   if (msg.type === "close-error-window") {
