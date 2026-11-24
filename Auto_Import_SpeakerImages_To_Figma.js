@@ -1,4 +1,4 @@
-const PLUGIN_VERSION = "1.5.0";
+const PLUGIN_VERSION = "1.5.1";
 
 function postUIMessage(message) {
   figma.ui.postMessage({ ...message, version: PLUGIN_VERSION });
@@ -239,7 +239,7 @@ function getChannelSegment(frame) {
   const height = Math.round(frame.height);
 
   if (width === 1080 && height === 1080) return "SoMe_code";
-  if (width === 500 && height === 400) return "NL_code";
+  if (width === 500 && height === 400) return "NL";
   return "";
 }
 
